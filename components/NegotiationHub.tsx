@@ -11,6 +11,8 @@ import {
 
 import { useGlobalState } from '../context/GlobalStateContext';
 import { Negotiation, Offer, NegotiationStatus, AIStrategy } from '../types';
+import { HelpIcon } from './Help/HelpIcon';
+import { GLOSSARY } from '../data/glossary';
 
 // --- Types transferred to global types.ts ---
 
@@ -348,7 +350,10 @@ const NegotiationHub: React.FC = () => {
                   <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium">Progreso</th>
                   <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium">Estado</th>
                   <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium">Sentimiento</th>
-                  <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium">ZOPA</th>
+                  <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium flex items-center justify-center gap-1">
+                    ZOPA
+                    <HelpIcon term={GLOSSARY['zopa'].term} content={GLOSSARY['zopa'].shortDefinition} size={10} />
+                  </th>
                   <th className="text-center p-4 text-[10px] text-obsidian-text-muted uppercase tracking-wider font-medium">Acciones</th>
                 </tr>
               </thead>
@@ -544,7 +549,10 @@ const NegotiationHub: React.FC = () => {
           {/* NASH ENGINE */}
           <ObsidianCard className="relative flex flex-col h-[400px]" noPadding>
             <div className="absolute top-4 left-4 z-10">
-              <h2 className="text-sm font-medium text-white tracking-widest">MOTOR DE EQUILIBRIO NASH</h2>
+              <h2 className="text-sm font-medium text-white tracking-widest flex items-center gap-2">
+                MOTOR DE EQUILIBRIO NASH
+                <HelpIcon content="Visualiza el punto óptimo de acuerdo donde ambas partes maximizan su utilidad sin perjudicar al otro." size={12} />
+              </h2>
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-obsidian-accent animate-pulse"></div>
                 <span className="text-[9px] text-obsidian-text-muted">LIVE ANALYSIS • {selectedNegotiation?.counterparty.toUpperCase()}</span>

@@ -303,8 +303,8 @@ export const MarketTopology: React.FC<MarketTopologyProps> = ({ kpis, opportunit
         <button
           onClick={() => setFilter('all')}
           className={`px-2 py-1 text-[9px] uppercase tracking-wider rounded transition-colors ${filter === 'all'
-              ? 'bg-white/[0.1] text-white'
-              : 'text-obsidian-text-muted hover:text-white'
+            ? 'bg-white/[0.1] text-white'
+            : 'text-obsidian-text-muted hover:text-white'
             }`}
         >
           Todos ({dataPoints.length})
@@ -314,8 +314,8 @@ export const MarketTopology: React.FC<MarketTopologyProps> = ({ kpis, opportunit
             key={type}
             onClick={() => setFilter(type)}
             className={`px-2 py-1 text-[9px] uppercase tracking-wider rounded transition-colors ${filter === type
-                ? 'bg-white/[0.1] text-white'
-                : 'text-obsidian-text-muted hover:text-white'
+              ? 'bg-white/[0.1] text-white'
+              : 'text-obsidian-text-muted hover:text-white'
               }`}
           >
             <span className="inline-block w-2 h-2 rounded-full mr-1" style={{ backgroundColor: getTypeColor(type) }} />
@@ -417,7 +417,7 @@ export const MarketTopology: React.FC<MarketTopologyProps> = ({ kpis, opportunit
 
             <div className="mt-3 pt-3 border-t border-white/[0.05]">
               <button className="w-full px-3 py-1.5 bg-obsidian-accent/20 border border-obsidian-accent/50 rounded text-[10px] text-white hover:bg-obsidian-accent/30 transition-all uppercase tracking-wider">
-                Análizar en DTO Lab
+                Análizar en Simulador
               </button>
             </div>
           </div>

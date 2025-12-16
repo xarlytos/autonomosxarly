@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// --- Obsidian Card (War Room Spec) ---
+// --- Obsidian Card (Dashboard Spec) ---
 // Features: Backdrop blur, inner top highlight, deep drop shadow, breathing border capability
 export const ObsidianCard: React.FC<{
   children: React.ReactNode;
@@ -91,19 +91,29 @@ export const ObsidianInput: React.FC<ObsidianInputProps> = ({ label, icon, class
 // --- Obsidian Button ---
 interface ObsidianButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   fullWidth?: boolean;
+  glow?: boolean;
 }
 
 export const ObsidianButton: React.FC<ObsidianButtonProps> = ({
   children,
   variant = 'primary',
+  size = 'md',
   isLoading,
   className,
   fullWidth,
+  glow,
   ...props
 }) => {
-  const baseStyles = `${fullWidth ? 'w-full' : ''} py-3.5 rounded-md text-sm font-light tracking-wide transition-all duration-300 flex items-center justify-center relative overflow-hidden`;
+  const baseStyles = `${fullWidth ? 'w-full' : ''} rounded-md font-light tracking-wide transition-all duration-300 flex items-center justify-center relative overflow-hidden`;
+
+  const sizeStyles = {
+    sm: 'py-1.5 px-3 text-xs',
+    md: 'py-3.5 px-6 text-sm',
+    lg: 'py-4 px-8 text-base'
+  };
 
   const variants = {
     primary: `
@@ -128,14 +138,22 @@ export const ObsidianButton: React.FC<ObsidianButtonProps> = ({
       hover:bg-white
       hover:text-black
       hover:border-white
-      text-[11px]
       uppercase
     `
   };
 
+  const glowStyles = glow ? `
+    !border-obsidian-accent/50 
+    !bg-obsidian-accent/10 
+    !shadow-[0_0_20px_rgba(106,79,251,0.3)]
+    hover:!bg-obsidian-accent/20 
+    hover:!shadow-[0_0_30px_rgba(106,79,251,0.5)]
+    text-white
+  ` : '';
+
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''} ${className}`}
+      className={`${baseStyles} ${sizeStyles[size]} ${variants[variant]} ${glowStyles} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''} ${className}`}
       disabled={isLoading}
       {...props}
     >

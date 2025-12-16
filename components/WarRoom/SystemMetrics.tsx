@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Cpu, Globe, Activity, X, AlertTriangle, Zap, HelpCircle } from 'lucide-react';
 import type { KPIs } from '../../types';
 import { ObsidianCard, ObsidianTooltip } from '../ui/ObsidianElements';
+import { HelpIcon } from '../Help/HelpIcon';
+import { GLOSSARY } from '../../data/glossary';
 
 interface SystemMetricsProps {
   kpis: KPIs | null;
@@ -115,11 +117,14 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ kpis }) => {
           <Globe size={14} className="text-obsidian-text-muted mb-1.5" />
           <div className="text-[9px] text-obsidian-text-muted uppercase tracking-widest mb-0.5 flex items-center gap-1">
             Latencia
-            <ObsidianTooltip content="Tiempo promedio de respuesta del sistema en milisegundos. Valores bajos indican mejor rendimiento y velocidad de procesamiento." position="top">
-              <HelpCircle size={8} className="cursor-help opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity" />
-            </ObsidianTooltip>
+            <HelpIcon
+              term={GLOSSARY['latencia'].term}
+              content={GLOSSARY['latencia'].fullDefinition}
+              size={8}
+              className="opacity-0 group-hover:opacity-50 hover:!opacity-100"
+            />
           </div>
-          <div className="text-base font-thin text-white tabular-nums">{kpis.latency.current}ms</div>
+          <div className="text-base font-thin text-white tabular-nums">{Math.round(kpis.latency.current)}ms</div>
         </div>
 
         <div className="bg-white/[0.02] border border-white/[0.04] rounded px-3 py-2.5 flex flex-col items-center group relative">

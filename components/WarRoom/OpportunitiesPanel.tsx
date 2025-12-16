@@ -81,7 +81,10 @@ export const OpportunitiesPanel: React.FC<OpportunitiesPanelProps> = ({ opportun
               <div className="flex items-center gap-1">
                 <span className="text-[10px] text-obsidian-text-muted">Riesgo: </span>
                 <span className={`text-sm font-medium uppercase ${getRiskColor(topOpportunity.risk)}`}>
-                  {topOpportunity.risk}
+                  {topOpportunity.risk === 'validated' ? '✓ VÁLIDO' :
+                    topOpportunity.risk === 'low' ? 'BAJO' :
+                      topOpportunity.risk === 'medium' ? 'MEDIO' :
+                        topOpportunity.risk === 'high' ? 'ALTO' : topOpportunity.risk.toUpperCase()}
                 </span>
                 <ObsidianTooltip content="Nivel de riesgo evaluado: validated (validado), low (bajo), medium (medio), high (alto). Basado en volatilidad y factores externos." position="top">
                   <HelpCircle size={9} className="cursor-help opacity-40 hover:opacity-100 transition-opacity" />
@@ -100,7 +103,7 @@ export const OpportunitiesPanel: React.FC<OpportunitiesPanelProps> = ({ opportun
               href="#"
               className="text-[10px] text-obsidian-accent border-b border-obsidian-accent/30 pb-0.5 hover:text-white hover:border-white transition-colors"
             >
-              Simular en DTO Lab →
+              Simular en Simulador →
             </a>
           </div>
         </div>
@@ -131,7 +134,10 @@ export const OpportunitiesPanel: React.FC<OpportunitiesPanelProps> = ({ opportun
                   Prob: <span className="text-white">{opp.probability}%</span>
                 </span>
                 <span className={getRiskColor(opp.risk)}>
-                  {opp.risk}
+                  {opp.risk === 'validated' ? '✓' :
+                    opp.risk === 'low' ? 'B' :
+                      opp.risk === 'medium' ? 'M' :
+                        opp.risk === 'high' ? 'A' : opp.risk.substring(0, 1).toUpperCase()}
                 </span>
               </div>
             </div>

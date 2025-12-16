@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, HelpCircle, BarChart3 } from 'lucide-react';
 import type { KPIs } from '../../types';
 import { ObsidianTooltip, ObsidianCard } from '../ui/ObsidianElements';
+import { HelpIcon } from '../Help/HelpIcon';
+import { GLOSSARY } from '../../data/glossary';
 
 interface KPIPanelProps {
   kpis: KPIs | null;
@@ -182,7 +184,7 @@ export const KPIPanel: React.FC<KPIPanelProps> = ({ kpis }) => {
         </div>
         <div className="bg-white/[0.02] border border-white/[0.04] rounded px-4 py-3">
           <div className="text-[10px] text-obsidian-text-muted uppercase tracking-widest mb-1">Latencia</div>
-          <div className="text-xl font-thin text-white tabular-nums">{kpis.latency.current}ms</div>
+          <div className="text-xl font-thin text-white tabular-nums">{Math.round(kpis.latency.current)}ms</div>
         </div>
       </div>
     </div>

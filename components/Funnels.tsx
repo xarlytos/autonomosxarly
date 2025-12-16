@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     GitGraph, Share2, Zap, LayoutTemplate, MoreVertical,
     ArrowRight, Filter, Plus, Users, DollarSign,
-    TrendingUp, MousePointer, Eye, Settings, ArrowLeft, Search, Trash2, Copy, Save, X
+    TrendingUp, MousePointer, Eye, Settings, ArrowLeft, Search, Trash2, Copy, Save, X, Gift, Video
 } from 'lucide-react';
 import { ObsidianCard, ObsidianButton } from './ui/ObsidianElements';
 
@@ -63,6 +63,68 @@ const INITIAL_FUNNELS: Funnel[] = [
     }
 ];
 
+interface FunnelTemplate {
+    id: string;
+    name: string;
+    description: string;
+    steps: { name: string; type: FunnelStep['type'] }[];
+    icon: any;
+    color: string;
+}
+
+const FUNNEL_TEMPLATES: FunnelTemplate[] = [
+    {
+        id: 'webinar-funnel',
+        name: 'Webinar High Ticket',
+        description: 'Ideal para venta de servicios o productos >$500. Captura, educa y vende.',
+        icon: Video,
+        color: 'text-purple-400',
+        steps: [
+            { name: 'Registro al Webinar', type: 'landing' },
+            { name: 'Sala de Espera / Intro', type: 'landing' },
+            { name: 'Webinar Live/Automated', type: 'webinar' },
+            { name: 'Oferta Irresistible', type: 'checkout' },
+            { name: 'Gracias & Onboarding', type: 'thankyou' }
+        ]
+    },
+    {
+        id: 'product-launch',
+        name: 'Product Launch Formula',
+        description: 'Serie de 3-4 videos de valor antes de abrir el carrito de compra.',
+        icon: TrendingUp,
+        color: 'text-green-400',
+        steps: [
+            { name: 'Opt-in Page', type: 'optin' },
+            { name: 'Episodio 1: La Oportunidad', type: 'landing' },
+            { name: 'Episodio 2: La Transformación', type: 'landing' },
+            { name: 'Episodio 3: El Método', type: 'landing' },
+            { name: 'Carta de Ventas', type: 'checkout' }
+        ]
+    },
+    {
+        id: 'lead-magnet',
+        name: 'Lead Magnet Simple',
+        description: 'Captura leads rápidamente entregando un recurso gratuito.',
+        icon: Gift,
+        color: 'text-blue-400',
+        steps: [
+            { name: 'Landing Page (Promesa)', type: 'landing' },
+            { name: 'Página de Descarga', type: 'thankyou' },
+            { name: 'Secuencia de Email', type: 'email' }
+        ]
+    },
+    {
+        id: 'blank',
+        name: 'Funnel en Blanco',
+        description: 'Empieza desde cero y construye tu propia estrategia.',
+        icon: LayoutTemplate,
+        color: 'text-gray-400',
+        steps: [
+            { name: 'Landing Page', type: 'landing' }
+        ]
+    }
+];
+
 const Funnels: React.FC = () => {
     // --- STATE ---
     const [funnels, setFunnels] = useState<Funnel[]>(INITIAL_FUNNELS);
@@ -74,6 +136,8 @@ const Funnels: React.FC = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newFunnelName, setNewFunnelName] = useState('');
     const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
     // Derived State
     const activeFunnel = funnels.find(f => f.id === selectedFunnelId);
@@ -100,6 +164,17 @@ const Funnels: React.FC = () => {
     // --- HANDLERS: DASHBOARD ---
     const handleCreateFunnel = () => {
         if (!newFunnelName.trim()) return;
+
+        const template = FUNNEL_TEMPLATES.find(t => t.id === selectedTemplate) || FUNNEL_TEMPLATES[3]; // Default to blank if null (though UI prevents it)
+
+        const newSteps: FunnelStep[] = template.steps.map((step, idx) => ({
+            id: `s-${Date.now()}-${idx}`,
+            name: step.name,
+            type: step.type,
+            visitors: 0,
+            conversions: 0
+        }));
+
         const newFunnel: Funnel = {
             id: Date.now().toString(),
             name: newFunnelName,
@@ -109,12 +184,11 @@ const Funnels: React.FC = () => {
             conversionRate: 0,
             lastUpdated: 'Just now',
             pixels: { fb: false, ga4: false, tiktok: false },
-            steps: [
-                { id: `s-${Date.now()}`, name: 'Landing Page', type: 'landing', visitors: 0, conversions: 0 }
-            ]
+            steps: newSteps
         };
         setFunnels(prev => [newFunnel, ...prev]);
         setNewFunnelName('');
+        setSelectedTemplate(null);
         setShowCreateModal(false);
         setNotification({ message: 'Funnel creado exitosamente', type: 'success' });
         // Auto open
@@ -205,21 +279,64 @@ const Funnels: React.FC = () => {
             {/* --- CREATE MODAL --- */}
             {showCreateModal && (
                 <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowCreateModal(false)}>
-                    <div className="bg-[#16161A] border border-white/10 w-full max-w-sm rounded-xl shadow-2xl p-6 animate-[scaleIn_0.2s_ease-out]" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-lg font-light text-white mb-4">Crear Nuevo Funnel</h3>
-                        <input
-                            autoFocus
-                            placeholder="Nombre del Funnel..."
-                            className="w-full bg-[#0B0B0D] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-obsidian-accent outline-none mb-6"
-                            value={newFunnelName}
-                            onChange={(e) => setNewFunnelName(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleCreateFunnel()}
-                        />
-                        <div className="flex gap-3 justify-end">
-                            <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 text-xs text-obsidian-text-muted hover:text-white">Cancelar</button>
-                            <ObsidianButton variant="primary" onClick={handleCreateFunnel} disabled={!newFunnelName.trim()}>
-                                Crear Funnel
-                            </ObsidianButton>
+                    <div className="bg-[#16161A] border border-white/10 w-full max-w-4xl rounded-xl shadow-2xl overflow-hidden animate-[scaleIn_0.2s_ease-out]" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-xl font-light text-white">Crear Nuevo Funnel</h3>
+                                <p className="text-sm text-obsidian-text-muted mt-1">Selecciona una plantilla para comenzar o empieza desde cero.</p>
+                            </div>
+                            <button onClick={() => setShowCreateModal(false)}><X className="text-obsidian-text-muted hover:text-white" /></button>
+                        </div>
+
+                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {FUNNEL_TEMPLATES.map(template => (
+                                <div
+                                    key={template.id}
+                                    onClick={() => setSelectedTemplate(template.id)}
+                                    className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col h-full ${selectedTemplate === template.id
+                                            ? 'bg-obsidian-accent/10 border-obsidian-accent shadow-[0_0_15px_rgba(106,79,251,0.2)]'
+                                            : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${template.id === selectedTemplate ? 'bg-obsidian-accent text-white' : 'bg-[#0B0B0D] text-gray-400'}`}>
+                                        <template.icon size={20} className={template.id === selectedTemplate ? 'text-white' : template.color} />
+                                    </div>
+                                    <h4 className="text-white font-medium mb-2">{template.name}</h4>
+                                    <p className="text-xs text-obsidian-text-muted mb-4 flex-1">{template.description}</p>
+
+                                    <div className="space-y-1">
+                                        {template.steps.slice(0, 3).map((step, i) => (
+                                            <div key={i} className="flex items-center gap-2 text-[10px] text-gray-500">
+                                                <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+                                                {step.name}
+                                            </div>
+                                        ))}
+                                        {template.steps.length > 3 && (
+                                            <div className="text-[10px] text-gray-600 pl-3">+{template.steps.length - 3} pasos más...</div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="p-6 border-t border-white/5 bg-[#0B0B0D]/50 flex items-center justify-between">
+                            <div className="flex-1 mr-4">
+                                <label className="text-xs text-obsidian-text-muted block mb-1.5 ml-1">Nombre del Funnel</label>
+                                <input
+                                    autoFocus
+                                    placeholder="ej. Lanzamiento Q3 Verano"
+                                    className="w-full bg-[#0B0B0D] border border-white/10 rounded px-4 py-2.5 text-sm text-white focus:border-obsidian-accent outline-none"
+                                    value={newFunnelName}
+                                    onChange={(e) => setNewFunnelName(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFunnel()}
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-6">
+                                <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 text-xs text-obsidian-text-muted hover:text-white">Cancelar</button>
+                                <ObsidianButton variant="primary" onClick={handleCreateFunnel} disabled={!newFunnelName.trim() || !selectedTemplate}>
+                                    Crear Funnel
+                                </ObsidianButton>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -243,7 +360,7 @@ const Funnels: React.FC = () => {
                         </span>
                         {view === 'builder' && activeFunnel && (
                             <span className={`px-2 py-0.5 rounded-full text-[10px] border font-medium ${activeFunnel.status === 'active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                    'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                                'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
                                 }`}>
                                 {activeFunnel.status.toUpperCase()}
                             </span>
@@ -358,7 +475,7 @@ const Funnels: React.FC = () => {
                                                 </div>
                                                 <div className="absolute top-2 left-2">
                                                     <span className={`px-2 py-0.5 rounded text-[10px] border font-medium ${funnel.status === 'active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                            'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                                        'bg-gray-500/10 text-gray-400 border-gray-500/20'
                                                         }`}>
                                                         {funnel.status.toUpperCase()}
                                                     </span>
@@ -444,8 +561,8 @@ const Funnels: React.FC = () => {
                                             <div
                                                 onClick={() => setSelectedStepId(step.id)}
                                                 className={`w-52 bg-[#16161A] border rounded-xl shadow-xl transition-all group relative cursor-pointer hover:-translate-y-1 shrink-0 ${selectedStepId === step.id
-                                                        ? 'border-obsidian-accent shadow-[0_0_20px_rgba(106,79,251,0.2)]'
-                                                        : 'border-white/10 hover:border-obsidian-accent/50'
+                                                    ? 'border-obsidian-accent shadow-[0_0_20px_rgba(106,79,251,0.2)]'
+                                                    : 'border-white/10 hover:border-obsidian-accent/50'
                                                     }`}
                                             >
                                                 <div className={`h-1.5 w-full rounded-t-xl ${selectedStepId === step.id ? 'bg-obsidian-accent' : 'bg-transparent'

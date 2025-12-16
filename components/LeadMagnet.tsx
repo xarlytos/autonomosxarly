@@ -86,12 +86,66 @@ const INITIAL_LEAD_MAGNETS: LeadMagnet[] = [
 ];
 
 const TEMPLATE_LIBRARY = [
-    { type: 'ebook', icon: BookOpen, label: 'eBook', color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
-    { type: 'checklist', icon: CheckSquare, label: 'Checklist', color: 'text-green-400', bgColor: 'bg-green-500/10' },
-    { type: 'template', icon: FileText, label: 'Template', color: 'text-purple-400', bgColor: 'bg-purple-500/10' },
-    { type: 'video', icon: Video, label: 'Video Course', color: 'text-red-400', bgColor: 'bg-red-500/10' },
-    { type: 'toolkit', icon: Gift, label: 'Toolkit', color: 'text-yellow-400', bgColor: 'bg-yellow-500/10' },
-    { type: 'course', icon: BookOpen, label: 'Mini Course', color: 'text-indigo-400', bgColor: 'bg-indigo-500/10' }
+    {
+        type: 'ebook',
+        icon: BookOpen,
+        label: 'eBook',
+        color: 'text-blue-400',
+        bgColor: 'bg-blue-500/10',
+        defaultName: 'Guía Definitiva de...',
+        defaultDesc: 'Descarga este ebook gratuito y descubre los secretos para mejorar tu...',
+        defaultTags: ['Guía', 'PDF', 'Educativo']
+    },
+    {
+        type: 'checklist',
+        icon: CheckSquare,
+        label: 'Checklist',
+        color: 'text-green-400',
+        bgColor: 'bg-green-500/10',
+        defaultName: 'Checklist de Verificación',
+        defaultDesc: 'Asegúrate de no olvidar ningún paso con esta lista de control práctica paso a paso.',
+        defaultTags: ['Checklist', 'Productividad', 'Rápido']
+    },
+    {
+        type: 'template',
+        icon: FileText,
+        label: 'Template',
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-500/10',
+        defaultName: 'Plantilla de Trabajo',
+        defaultDesc: 'Copia y pega este recurso listo para usar en tus propios proyectos.',
+        defaultTags: ['Plantilla', 'Recurso', 'Editable']
+    },
+    {
+        type: 'video',
+        icon: Video,
+        label: 'Video Course',
+        color: 'text-red-400',
+        bgColor: 'bg-red-500/10',
+        defaultName: 'Masterclass Exclusiva',
+        defaultDesc: 'Accede a este entrenamiento en video de 30 minutos donde te explico...',
+        defaultTags: ['Video', 'Masterclass', 'Entrenamiento']
+    },
+    {
+        type: 'toolkit',
+        icon: Gift,
+        label: 'Toolkit',
+        color: 'text-yellow-400',
+        bgColor: 'bg-yellow-500/10',
+        defaultName: 'Kit de Herramientas',
+        defaultDesc: 'Una colección curada de las mejores herramientas y recursos para...',
+        defaultTags: ['Toolkit', 'Herramientas', 'Recursos']
+    },
+    {
+        type: 'course',
+        icon: BookOpen,
+        label: 'Mini Course',
+        color: 'text-indigo-400',
+        bgColor: 'bg-indigo-500/10',
+        defaultName: 'Mini Curso por Email',
+        defaultDesc: 'Un curso de 5 días entregado directamente en tu bandeja de entrada.',
+        defaultTags: ['Curso', 'Email', 'Educación']
+    }
 ];
 
 const LeadMagnet: React.FC = () => {
@@ -298,7 +352,15 @@ const LeadMagnet: React.FC = () => {
                                     {TEMPLATE_LIBRARY.map(template => (
                                         <button
                                             key={template.type}
-                                            onClick={() => setSelectedType(template.type as LeadMagnetType)}
+                                            onClick={() => {
+                                                setSelectedType(template.type as LeadMagnetType);
+                                                setFormData({
+                                                    ...formData,
+                                                    name: template.defaultName || '',
+                                                    description: template.defaultDesc || '',
+                                                    tags: template.defaultTags || []
+                                                });
+                                            }}
                                             className="p-6 bg-white/5 border border-white/10 rounded-xl hover:border-obsidian-accent hover:bg-white/10 transition-all group text-center"
                                         >
                                             <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${template.bgColor} flex items-center justify-center`}>
@@ -376,7 +438,7 @@ const LeadMagnet: React.FC = () => {
                         </span>
                         {view !== 'dashboard' && activeMagnet && (
                             <span className={`px-2 py-0.5 rounded-full text-[10px] border font-medium ${activeMagnet.status === 'active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                    'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                                'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
                                 }`}>
                                 {activeMagnet.status.toUpperCase()}
                             </span>
@@ -499,7 +561,7 @@ const LeadMagnet: React.FC = () => {
                                                     )}
                                                     <div className="absolute top-2 left-2">
                                                         <span className={`px-2 py-0.5 rounded text-[10px] border font-medium ${magnet.status === 'active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                                'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                                            'bg-gray-500/10 text-gray-400 border-gray-500/20'
                                                             }`}>
                                                             {magnet.status.toUpperCase()}
                                                         </span>

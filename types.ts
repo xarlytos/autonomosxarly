@@ -173,10 +173,10 @@ export interface FinancialMetrics {
   taxLiability: number;
 }
 
-export type ViewMode = 'dashboard' | 'transactions' | 'invoices' | 'tax' | 'connect';
-export type PaymentNetwork = 'SWIFT' | 'SEPA' | 'LIGHTNING' | 'USDC' | 'ACH';
-export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
-export type EscrowStatus = 'HELD' | 'RELEASED' | 'DISPUTED' | 'REFUNDED';
+export type ViewMode = 'dashboard' | 'transactions' | 'invoices' | 'tax' | 'connect' | 'ledger' | 'payments' | 'reports' | 'escrow' | 'contacts';
+export type PaymentNetwork = 'SWIFT' | 'SEPA' | 'LIGHTNING' | 'USDC' | 'ACH' | 'POLYGON' | 'ETH';
+export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'VIEWED';
+export type EscrowStatus = 'HELD' | 'RELEASED' | 'DISPUTED' | 'REFUNDED' | 'ACTIVE';
 
 // --- Email Hub Types ---
 export interface EmailContact {
@@ -208,4 +208,54 @@ export interface Email {
   };
   threadId?: string;
   snoozedUntil?: string;
+}
+
+// --- CRM Contact Types ---
+export type ContactType = 'CLIENT' | 'LEAD' | 'PARTNER' | 'COMPETITOR';
+export type ContactStatus = 'ACTIVE' | 'INACTIVE' | 'ARCHIVED' | 'BLOCKED' | 'WARM' | 'COLD';
+
+export interface Interaction {
+  id: string;
+  type: 'EMAIL' | 'CALL' | 'MEETING' | 'NOTE' | 'FUNNEL';
+  direction?: 'INBOUND' | 'OUTBOUND';
+  date: string;
+  subject: string;
+  details?: string;
+  status?: 'COMPLETED' | 'SCHEDULED' | 'MISSED';
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  email: string;
+  phone: string;
+  type: ContactType;
+  status: ContactStatus;
+  lastContact: string;
+  tags: string[];
+  avatar?: string;
+  location?: string;
+  social?: { linkedin?: string; twitter?: string; website?: string };
+  ltv?: number; // Lifetime Value
+  notes: string;
+  history?: Interaction[]; // New field
+  dealSize?: number; // For leads
+  probability?: number; // For leads
+  nextAction?: string;
+  nextActionDate?: string;
+}
+
+// --- Calendar Types ---
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date | string; // Allow ISO string
+  end: Date | string;
+  type: 'MEETING' | 'CALL' | 'TASK' | 'DEADLINE';
+  description?: string;
+  contactId?: string; // Link to CRM
+  status: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+  platform?: 'GOOGLE' | 'OUTLOOK' | 'INTERNAL'; // Sync status
 }

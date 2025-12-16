@@ -1,48 +1,52 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, FlaskConical, Settings, LogOut, Network, Briefcase, ScanFace, BrainCircuit, Scale, Share2, HeartPulse, Fingerprint, ChevronRight, ChevronLeft, MessageSquareText, Mail, Filter, Gift } from 'lucide-react';
+import { LayoutDashboard, FlaskConical, Settings, LogOut, Network, Briefcase, ScanFace, BrainCircuit, Scale, Share2, HeartPulse, Fingerprint, ChevronRight, ChevronLeft, MessageSquareText, Mail, Filter, Gift, Users, Wallet, TrendingUp, Calendar } from 'lucide-react';
 
 interface SidebarProps {
-  currentView: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'avatar-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet';
-  onChangeView: (view: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'avatar-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet') => void;
+  currentView: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar';
+  onChangeView: (view: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar') => void;
   onLogout: () => void;
+  onOpenHelp: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onLogout, onOpenHelp }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const navSections = [
     {
       title: 'COMMAND',
       items: [
-        { id: 'war-room', label: 'War Room', icon: <LayoutDashboard size={20} /> },
-        { id: 'dto-lab', label: 'DTO Lab', icon: <FlaskConical size={20} /> },
+        { id: 'war-room', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+        { id: 'dto-lab', label: 'Simulador', icon: <FlaskConical size={20} /> },
         { id: 'email-hub', label: 'Email Hub', icon: <Mail size={20} /> },
+        { id: 'calendar', label: 'Calendario', icon: <Calendar size={20} /> },
       ]
     },
     {
-      title: 'SWARMS',
+      title: 'AUTOMATIZACIÓN',
       items: [
-        { id: 'swarm-orchestrator', label: 'Active Agents', icon: <Network size={20} /> },
+        { id: 'swarm-orchestrator', label: 'Automatizaciones', icon: <Network size={20} /> },
         { id: 'negotiation-hub', label: 'Negotiation (MNP)', icon: <Briefcase size={20} /> },
       ]
     },
     {
       title: 'GROWTH',
       items: [
-        { id: 'avatar-studio', label: 'Avatar Studio', icon: <ScanFace size={20} /> },
+        { id: 'persona-studio', label: 'Persona Studio', icon: <ScanFace size={20} /> },
         { id: 'content-social', label: 'Social Studio', icon: <MessageSquareText size={20} /> },
-        { id: 'bionic-sales', label: 'Bionic Sales', icon: <BrainCircuit size={20} /> },
+        { id: 'bionic-sales', label: 'Bionic Sales', icon: <TrendingUp size={20} /> },
+        { id: 'contacts', label: 'Contactos', icon: <Users size={20} /> },
+        { id: 'neuro-finance', label: 'Neuro-Finance', icon: <Wallet size={20} /> },
         { id: 'funnels', label: 'Funnels', icon: <Filter size={20} /> },
         { id: 'lead-magnet', label: 'Lead Magnets', icon: <Gift size={20} /> },
       ]
     },
     {
-      title: 'BACKBONE',
+      title: 'INFRAESTRUCTURA',
       items: [
-        { id: 'neuro-finance', label: 'Neuro-Finance', icon: <Scale size={20} /> },
+        { id: 'neuro-finance', label: 'Finanzas', icon: <Scale size={20} /> },
         { id: 'ontology-core', label: 'Ontologies', icon: <Share2 size={20} /> },
         { id: 'system-health', label: 'Health & Audit', icon: <HeartPulse size={20} /> },
-        { id: 'ssi-vault', label: 'SSI Security', icon: <Fingerprint size={20} /> },
+        { id: 'ssi-vault', label: 'Seguridad', icon: <Fingerprint size={20} /> },
       ]
     }
   ];
@@ -166,6 +170,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
         </div>
 
         <div className={`h-[1px] bg-white/[0.04] w-full my-1 ${isCollapsed ? 'hidden' : 'block'}`}></div>
+
+        <button
+          onClick={onOpenHelp}
+          className={`flex items-center gap-3 text-obsidian-text-muted hover:text-obsidian-accent transition-colors p-2.5 rounded-lg hover:bg-white/[0.04] w-full ${isCollapsed ? 'justify-center' : ''}`} title="Ayuda y Glosario"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
+          {!isCollapsed && <span className="text-xs">Ayuda</span>}
+        </button>
 
         <button className={`flex items-center gap-3 text-obsidian-text-muted hover:text-white transition-colors p-2.5 rounded-lg hover:bg-white/[0.04] w-full ${isCollapsed ? 'justify-center' : ''}`} title="Settings">
           <Settings size={18} strokeWidth={1.5} />

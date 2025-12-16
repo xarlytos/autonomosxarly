@@ -4,7 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import DTOLab from './components/DTOLab';
 import SwarmOrchestrator from './components/SwarmOrchestrator';
 import NegotiationHub from './components/NegotiationHub';
-import AvatarStudio from './components/AvatarStudio';
+import PersonaStudio from './components/PersonaStudio';
 import BionicSales from './components/BionicSales';
 import NeuroFinance from './components/NeuroFinance';
 import OntologyCore from './components/OntologyCore';
@@ -14,94 +14,156 @@ import ContentSocialStudio from './components/ContentSocialStudio';
 import EmailHub from './components/EmailHub';
 import Funnels from './components/Funnels';
 import LeadMagnet from './components/LeadMagnet';
-import { ObsidianCard } from './components/ui/ObsidianElements';
+import { ContactManager } from './components/CRM/ContactManager';
+import { ObsidianCard, ObsidianButton } from './components/ui/ObsidianElements';
 import type { AuthState, LoginFormData } from './types';
-import { Wifi, WifiOff, Activity } from 'lucide-react';
+import { Wifi, WifiOff, Settings2 } from 'lucide-react';
 import { useWarRoom } from './hooks/useWarRoom';
+import { useDashboardLayout } from './hooks/useDashboardLayout';
+import { DashboardGrid, DashboardCustomizer } from './components/Dashboard';
+import { HelpCenter } from './components/HelpCenter/HelpCenter';
 import {
   KPIPanel,
   SwarmStatusPanel,
   EventStream,
   OpportunitiesPanel,
   AlertsPanel,
-  RevenueChart,
   SystemMetrics,
   MarketTopology
 } from './components/WarRoom';
+import { CalendarManager } from './components/Calendar/CalendarManager';
+import { TodayEventsWidget } from './components/Dashboard/TodayEventsWidget';
+import type { WidgetType } from './types/dashboard';
 
-// --- WAR ROOM DASHBOARD PAGE ---
+// --- DASHBOARD PRINCIPAL PAGE ---
 
-const WarRoomDashboard: React.FC = () => {
-  const {
-    connected,
-    kpis,
-    swarms,
-    events,
-    opportunities,
-    alerts,
-    controlSwarm,
-    markAlertAsRead
-  } = useWarRoom();
 
+// --- DASHBOARD PRINCIPAL PAGE ---
+
+import { InteractiveTour } from './components/Onboarding/InteractiveTour';
+import { useOnboarding } from './hooks/useOnboarding';
+import { DASHBOARD_TOUR_STEPS } from './data/tourSteps';
+
+
+
+interface WarRoomDashboardProps {
+  onNavigate: (view: any) => void;
+}
+
+const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
+  const { connected, kpis, swarms, events, opportunities, alerts, controlSwarm, markAlertAsRead } = useWarRoom();
+  const { layout, isCustomizing, setIsCustomizing, addWidget, removeWidget, updateLayout, resetLayout } = useDashboardLayout();
   const [activeTab, setActiveTab] = useState<'overview' | 'swarms' | 'alerts'>('overview');
 
+  // Onboarding Hook
+  const { isPlaying, completeTour, skipTour } = useOnboarding('dashboard');
+
+  // Helper function to get widget title
+  const getWidgetTitle = (type: WidgetType): string => {
+    const titles: Record<WidgetType, string> = {
+      'kpi-revenue': 'Ingresos',
+      'kpi-profitability': 'Rentabilidad',
+      'kpi-efficiency': 'Eficiencia',
+      'system-metrics': 'Métricas del Sistema',
+      'opportunities': 'Oportunidades',
+      'market-topology': 'Topología de Mercado',
+      'event-stream': 'Stream de Eventos',
+      'swarm-status': 'Estado de Enjambres',
+      'calendar-events': 'Agenda de Hoy'
+    };
+    return titles[type] || type;
+  };
+
+  // Helper function to render widget content
+  const renderWidget = (type: WidgetType) => {
+    switch (type) {
+      case 'kpi-revenue':
+        return <KPIPanel kpis={kpis} />;
+      case 'system-metrics':
+        return <SystemMetrics kpis={kpis} />;
+      case 'opportunities':
+        return <OpportunitiesPanel opportunities={opportunities} />;
+      case 'market-topology':
+        return <MarketTopology kpis={kpis} opportunities={opportunities} />;
+      case 'event-stream':
+        return <EventStream events={events} />;
+      case 'swarm-status':
+        return <SwarmStatusPanel swarms={swarms} onControlSwarm={controlSwarm} />;
+      case 'calendar-events':
+        return <TodayEventsWidget onViewCalendar={() => onNavigate('calendar')} />;
+      default:
+        return <div className="text-obsidian-text-muted text-sm">Widget: {type}</div>;
+    }
+  };
+
+  // Handle layout changes from drag-and-drop
+  const handleLayoutChange = (newLayout: any[]) => {
+    const updatedWidgets = layout.widgets.map(widget => {
+      const layoutItem = newLayout.find(l => l.i === widget.id);
+      if (layoutItem) {
+        return {
+          ...widget,
+          position: { x: layoutItem.x, y: layoutItem.y, w: layoutItem.w, h: layoutItem.h }
+        };
+      }
+      return widget;
+    });
+    updateLayout(updatedWidgets);
+  };
+
   return (
-    <div className="w-full h-screen px-6 py-6 flex items-center justify-center overflow-hidden relative">
+    <div className="w-full h-screen px-6 py-6 overflow-hidden relative">
+      <InteractiveTour
+        isOpen={isPlaying}
+        steps={DASHBOARD_TOUR_STEPS}
+        onComplete={completeTour}
+        onSkip={skipTour}
+      />
+
       {/* Background Ambient Glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-obsidian-accent/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-obsidian-success/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Main Grid */}
-      <div className="w-full max-w-[1600px] h-full max-h-[900px] grid grid-cols-12 grid-rows-12 gap-6 relative z-10 animate-[fadeIn_0.5s_ease-out]">
-
-        {/* -- TOP HEADER -- */}
-        <div className="col-span-12 row-span-1 flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 opacity-50">
-              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-              <span className="text-[10px] tracking-[0.3em] font-light uppercase">Obsidian OS v3.0 // War Room</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {connected ? (
-                <>
-                  <Wifi size={12} className="text-obsidian-success" />
-                  <span className="text-[9px] text-obsidian-success uppercase tracking-wider">En Línea</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff size={12} className="text-red-400" />
-                  <span className="text-[9px] text-red-400 uppercase tracking-wider">Desconectado</span>
-                </>
-              )}
-            </div>
+      {/* Header */}
+      <div className="dashboard-header relative z-20 flex justify-between items-center mb-6">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 opacity-50">
+            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+            <span className="text-[10px] tracking-[0.3em] font-light uppercase">Obsidian OS v3.0 // Dashboard</span>
           </div>
+          <div className="flex items-center gap-2">
+            {connected ? (
+              <>
+                <Wifi size={12} className="text-obsidian-success" />
+                <span className="text-[9px] text-obsidian-success uppercase tracking-wider">En Línea</span>
+              </>
+            ) : (
+              <>
+                <WifiOff size={12} className="text-red-400" />
+                <span className="text-[9px] text-red-400 uppercase tracking-wider">Desconectado</span>
+              </>
+            )}
+          </div>
+        </div>
 
+        <div className="flex items-center gap-3">
           {/* Tabs */}
-          <div className="flex gap-2">
+          <div className="dashboard-tabs flex gap-2">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'overview'
-                ? 'text-white border-b-2 border-obsidian-accent'
-                : 'text-obsidian-text-muted hover:text-white'
-                }`}
+              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'overview' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('swarms')}
-              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'swarms'
-                ? 'text-white border-b-2 border-obsidian-accent'
-                : 'text-obsidian-text-muted hover:text-white'
-                }`}
+              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'swarms' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
             >
               Enjambres ({swarms.length})
             </button>
             <button
               onClick={() => setActiveTab('alerts')}
-              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors relative ${activeTab === 'alerts'
-                ? 'text-white border-b-2 border-obsidian-accent'
-                : 'text-obsidian-text-muted hover:text-white'
-                }`}
+              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors relative ${activeTab === 'alerts' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
             >
               Alertas
               {alerts.filter(a => !a.read).length > 0 && (
@@ -109,64 +171,61 @@ const WarRoomDashboard: React.FC = () => {
               )}
             </button>
           </div>
+
+          {/* Customize Button */}
+          {activeTab === 'overview' && (
+            <div className="dashboard-customize-btn">
+              <ObsidianButton
+                variant="outline"
+                onClick={() => setIsCustomizing(true)}
+                className="text-xs"
+              >
+                <Settings2 size={14} />
+                Personalizar
+              </ObsidianButton>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* -- CONTENT BASED ON ACTIVE TAB -- */}
+      {/* Content */}
+      <div className="relative z-10 h-[calc(100%-80px)]">
         {activeTab === 'overview' && (
-          <>
-            {/* -- LEFT PANEL: METRICS -- */}
-            <div className="col-span-12 md:col-span-3 row-span-11 animate-[fadeIn_0.8s_ease-out_0.2s_both]">
-              <KPIPanel kpis={kpis} />
-            </div>
-
-            {/* -- CENTER: TOPOLOGY & EVENTS -- */}
-            <div className="col-span-12 md:col-span-6 row-span-11 flex flex-col gap-6 animate-[fadeIn_1s_ease-out_0.4s_both]">
-              {/* Market Topology */}
-              <ObsidianCard className="flex-[2] p-5">
-                <MarketTopology kpis={kpis} opportunities={opportunities} />
-              </ObsidianCard>
-
-              {/* Event Stream */}
-              <ObsidianCard className="flex-[1.5]" noPadding>
-                <div className="h-full w-full p-4 bg-black/20">
-                  <EventStream events={events} />
-                </div>
-              </ObsidianCard>
-            </div>
-
-            {/* -- RIGHT: OPPORTUNITIES & METRICS -- */}
-            <div className="col-span-12 md:col-span-3 row-span-11 flex flex-col gap-6 animate-[fadeIn_0.8s_ease-out_0.6s_both]">
-              {/* Opportunities */}
-              <div className="flex-1 overflow-y-auto">
-                <OpportunitiesPanel opportunities={opportunities} />
-              </div>
-
-              {/* System Metrics */}
-              <ObsidianCard className="h-[380px]" active>
-                <SystemMetrics kpis={kpis} />
-              </ObsidianCard>
-            </div>
-          </>
+          <DashboardGrid
+            widgets={layout.widgets}
+            isCustomizing={isCustomizing}
+            onLayoutChange={handleLayoutChange}
+            onRemoveWidget={removeWidget}
+            renderWidget={renderWidget}
+            getWidgetTitle={getWidgetTitle}
+          />
         )}
 
         {activeTab === 'swarms' && (
-          <>
-            {/* Swarms Grid - Centered like Alerts */}
-            <div className="col-span-12 md:col-span-8 md:col-start-3 row-span-11 overflow-y-auto p-2 animate-[fadeIn_0.5s_ease-out]">
-              <SwarmStatusPanel swarms={swarms} onControlSwarm={controlSwarm} />
-            </div>
-          </>
+          <div className="w-full max-w-4xl mx-auto h-full overflow-y-auto">
+            <SwarmStatusPanel swarms={swarms} onControlSwarm={controlSwarm} />
+          </div>
         )}
 
         {activeTab === 'alerts' && (
-          <>
-            {/* Alerts Panel */}
-            <div className="col-span-12 md:col-span-8 md:col-start-3 row-span-11 overflow-y-auto p-2 animate-[fadeIn_0.5s_ease-out]">
-              <AlertsPanel alerts={alerts} onMarkAsRead={markAlertAsRead} />
-            </div>
-          </>
+          <div className="w-full max-w-4xl mx-auto h-full overflow-y-auto">
+            <AlertsPanel alerts={alerts} onMarkAsRead={markAlertAsRead} />
+          </div>
         )}
       </div>
+
+      {/* Customizer Modal */}
+      {isCustomizing && (
+        <DashboardCustomizer
+          onAddWidget={addWidget}
+          onRemoveWidget={removeWidget}
+          onReset={resetLayout}
+          onClose={() => setIsCustomizing(false)}
+          existingWidgets={layout.widgets.map(w => w.type)}
+          currentWidgets={layout.widgets}
+          getWidgetTitle={getWidgetTitle}
+        />
+      )}
     </div>
   );
 };
@@ -181,7 +240,8 @@ const App: React.FC = () => {
     error: null,
   });
 
-  const [currentView, setCurrentView] = useState<'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'avatar-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet'>('war-room');
+  const [currentView, setCurrentView] = useState<'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar'>('war-room');
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const handleLogin = (data: LoginFormData) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -223,16 +283,19 @@ const App: React.FC = () => {
           currentView={currentView}
           onChangeView={setCurrentView}
           onLogout={handleLogout}
+          onOpenHelp={() => setIsHelpOpen(true)}
         />
 
         <main className="flex-1 h-screen overflow-hidden bg-[#0B0B0D]">
-          {currentView === 'war-room' && <WarRoomDashboard />}
+          {currentView === 'war-room' && <WarRoomDashboard onNavigate={setCurrentView} />}
           {currentView === 'dto-lab' && <DTOLab />}
           {currentView === 'swarm-orchestrator' && <SwarmOrchestrator />}
           {currentView === 'negotiation-hub' && <NegotiationHub />}
-          {currentView === 'avatar-studio' && <AvatarStudio />}
+          {currentView === 'persona-studio' && <PersonaStudio />}
           {currentView === 'content-social' && <ContentSocialStudio />}
           {currentView === 'bionic-sales' && <BionicSales />}
+          {currentView === 'contacts' && <ContactManager />}
+          {currentView === 'calendar' && <CalendarManager />}
           {currentView === 'neuro-finance' && <NeuroFinance />}
           {currentView === 'ontology-core' && <OntologyCore />}
           {currentView === 'system-health' && <SystemHealth />}
@@ -241,6 +304,8 @@ const App: React.FC = () => {
           {currentView === 'funnels' && <Funnels />}
           {currentView === 'lead-magnet' && <LeadMagnet />}
         </main>
+
+        <HelpCenter isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       </div>
     );
   }

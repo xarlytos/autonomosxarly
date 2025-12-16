@@ -5,6 +5,8 @@ import {
   Fingerprint, AlertTriangle, Plus, Copy, CheckCircle, XCircle, Clock,
   Activity, Award, Settings, FileKey, Users, Database, Sliders
 } from 'lucide-react';
+import { HelpIcon } from './Help/HelpIcon';
+import { GLOSSARY } from '../data/glossary';
 
 const CYAN_ACCENT = '#00F0FF';
 const ACCENT_COLOR = '#6A4FFB';
@@ -546,7 +548,7 @@ const SSIVault: React.FC = () => {
                   <span className="text-xs text-white">{MASTER_IDENTITY.createdAt.toLocaleDateString()}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-obsidian-text-muted block uppercase">Active Agents</span>
+                  <span className="text-[9px] text-obsidian-text-muted block uppercase">Automatizaciones Activas</span>
                   <span className="text-xs text-white">{SAMPLE_PASSPORTS.filter(p => p.status === 'ACTIVE').length} / {SAMPLE_PASSPORTS.length}</span>
                 </div>
               </div>
@@ -615,7 +617,10 @@ const SSIVault: React.FC = () => {
         {/* Identity Management Actions */}
         <div className="w-1/2 flex flex-col gap-6">
           <ObsidianCard>
-            <h3 className="text-sm text-white mb-4">Identity Actions</h3>
+            <h3 className="text-sm text-white mb-4 flex items-center gap-2">
+              Identity Actions
+              <HelpIcon content="Acciones para gestionar la identidad digital soberana (SSI) y credenciales verificables." size={12} />
+            </h3>
             <div className="space-y-3">
               <ObsidianButton className="w-full justify-start" variant="outline">
                 <RefreshCw size={14} />
@@ -682,6 +687,11 @@ const SSIVault: React.FC = () => {
             <h2 className="text-lg text-white flex items-center gap-2">
               <Fingerprint size={18} />
               Agent Passports
+              <HelpIcon
+                term={GLOSSARY['did'].term}
+                content="Pasaportes digitales para agentes de IA, verificando su identidad y reputación en la red."
+                size={14}
+              />
             </h2>
             <ObsidianButton onClick={() => setShowNewPassportForm(true)}>
               <Plus size={14} />
@@ -766,8 +776,8 @@ const SSIVault: React.FC = () => {
                       </td>
                       <td className="p-3 text-center">
                         <span className={`px-2 py-1 rounded text-[9px] uppercase font-semibold ${passport.status === 'ACTIVE' ? 'bg-green-500/20 text-green-500' :
-                            passport.status === 'SUSPENDED' ? 'bg-yellow-500/20 text-yellow-500' :
-                              'bg-red-500/20 text-red-500'
+                          passport.status === 'SUSPENDED' ? 'bg-yellow-500/20 text-yellow-500' :
+                            'bg-red-500/20 text-red-500'
                           }`}>
                           {passport.status}
                         </span>
@@ -808,8 +818,8 @@ const SSIVault: React.FC = () => {
                     <p className="text-sm text-obsidian-text-muted">{selectedPassport.role}</p>
                   </div>
                   <div className={`px-3 py-1.5 rounded border ${selectedPassport.status === 'ACTIVE' ? 'bg-green-500/10 border-green-500/30 text-green-500' :
-                      selectedPassport.status === 'SUSPENDED' ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500' :
-                        'bg-red-500/10 border-red-500/30 text-red-500'
+                    selectedPassport.status === 'SUSPENDED' ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500' :
+                      'bg-red-500/10 border-red-500/30 text-red-500'
                     }`}>
                     <span className="text-xs font-semibold">{selectedPassport.status}</span>
                   </div>
@@ -985,8 +995,8 @@ const SSIVault: React.FC = () => {
                 <div
                   key={secret.id}
                   className={`p-4 rounded border cursor-pointer transition-colors ${selectedSecretId === secret.id
-                      ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   onClick={() => setSelectedSecretId(secret.id)}
                 >
@@ -1241,8 +1251,8 @@ const SSIVault: React.FC = () => {
                   <span className="text-xs text-white">Federated Learning</span>
                   <div
                     className={`w-10 h-5 rounded-full relative cursor-pointer border transition-colors ${privacySettings.federatedLearning
-                        ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
-                        : 'bg-white/10 border-white/20'
+                      ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
+                      : 'bg-white/10 border-white/20'
                       }`}
                     onClick={() => setPrivacySettings({ ...privacySettings, federatedLearning: !privacySettings.federatedLearning })}
                   >
@@ -1260,8 +1270,8 @@ const SSIVault: React.FC = () => {
                   <span className="text-xs text-white">Noise Injection</span>
                   <div
                     className={`w-10 h-5 rounded-full relative cursor-pointer border transition-colors ${privacySettings.noiseInjection
-                        ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
-                        : 'bg-white/10 border-white/20'
+                      ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
+                      : 'bg-white/10 border-white/20'
                       }`}
                     onClick={() => setPrivacySettings({ ...privacySettings, noiseInjection: !privacySettings.noiseInjection })}
                   >
@@ -1279,8 +1289,8 @@ const SSIVault: React.FC = () => {
                   <span className="text-xs text-white">Gradient Clipping</span>
                   <div
                     className={`w-10 h-5 rounded-full relative cursor-pointer border transition-colors ${privacySettings.gradientClipping
-                        ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
-                        : 'bg-white/10 border-white/20'
+                      ? 'bg-obsidian-accent/30 border-obsidian-accent/50'
+                      : 'bg-white/10 border-white/20'
                       }`}
                     onClick={() => setPrivacySettings({ ...privacySettings, gradientClipping: !privacySettings.gradientClipping })}
                   >
@@ -1314,8 +1324,8 @@ const SSIVault: React.FC = () => {
               <div className="p-3 bg-white/5 rounded">
                 <span className="text-[10px] text-obsidian-text-muted uppercase block mb-1">Privacy Level</span>
                 <span className={`text-sm font-semibold ${privacySettings.mode === 'FORTRESS' ? 'text-green-500' :
-                    privacySettings.mode === 'GLASS_HOUSE' ? 'text-red-500' :
-                      'text-yellow-500'
+                  privacySettings.mode === 'GLASS_HOUSE' ? 'text-red-500' :
+                    'text-yellow-500'
                   }`}>
                   {privacySettings.mode}
                 </span>
@@ -1441,8 +1451,8 @@ const SSIVault: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-white font-medium">{key.label}</span>
                       <span className={`text-[8px] px-1.5 py-0.5 rounded font-semibold ${key.danger === 'CRITICAL' ? 'bg-red-500/20 text-red-500' :
-                          key.danger === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
-                            'bg-yellow-500/20 text-yellow-500'
+                        key.danger === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
+                          'bg-yellow-500/20 text-yellow-500'
                         }`}>
                         {key.danger}
                       </span>
@@ -1639,8 +1649,8 @@ const SSIVault: React.FC = () => {
             key={mode}
             onClick={() => setViewMode(mode)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${viewMode === mode
-                ? 'bg-obsidian-accent text-white shadow-[0_0_20px_rgba(106,79,251,0.3)]'
-                : 'bg-white/5 text-obsidian-text-muted hover:bg-white/10 hover:text-white'
+              ? 'bg-obsidian-accent text-white shadow-[0_0_20px_rgba(106,79,251,0.3)]'
+              : 'bg-white/5 text-obsidian-text-muted hover:bg-white/10 hover:text-white'
               }`}
           >
             <Icon size={14} />

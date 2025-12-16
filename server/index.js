@@ -226,8 +226,8 @@ for (let i = 0; i < 10; i++) {
 setInterval(() => {
   // Update KPIs
   kpis.revenue.current += Math.floor(Math.random() * 200 - 50);
-  kpis.systemLoad.current = Math.max(20, Math.min(80, kpis.systemLoad.current + Math.random() * 10 - 5));
-  kpis.latency.current = Math.max(15, Math.min(35, kpis.latency.current + Math.random() * 4 - 2));
+  kpis.systemLoad.current = Math.round(Math.max(20, Math.min(80, kpis.systemLoad.current + Math.random() * 10 - 5)));
+  kpis.latency.current = Math.round(Math.max(15, Math.min(35, kpis.latency.current + Math.random() * 4 - 2)));
 
   // Update swarm progress
   swarms.forEach(swarm => {
@@ -306,7 +306,7 @@ app.post('/api/swarms/:id/action', (req, res) => {
     return res.status(404).json({ error: 'Swarm not found' });
   }
 
-  switch(action) {
+  switch (action) {
     case 'pause':
       swarm.status = 'paused';
       break;
@@ -359,6 +359,6 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3001;
 
 httpServer.listen(PORT, () => {
-  console.log(`War Room Backend running on http://localhost:${PORT}`);
+  console.log(`Dashboard Backend running on http://localhost:${PORT}`);
   console.log('WebSocket server ready');
 });

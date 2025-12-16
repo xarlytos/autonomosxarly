@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Negotiation, Transaction, FinancialMetrics } from '../types';
+import { Negotiation, Transaction, FinancialMetrics, CalendarEvent } from '../types';
 
 // Initial Mock Data
 const INITIAL_NEGOTIATIONS: Negotiation[] = [
@@ -121,6 +121,15 @@ const INITIAL_METRICS: FinancialMetrics = {
     taxLiability: 5191.42,
 };
 
+const INITIAL_EVENTS: CalendarEvent[] = [
+    {
+        id: '1', title: 'Q3 Strategy Review', start: new Date().toISOString(), end: new Date().toISOString(), type: 'MEETING', status: 'PENDING', platform: 'GOOGLE'
+    },
+    {
+        id: '2', title: 'Client Follow-up: Nexus', start: new Date(Date.now() + 86400000).toISOString(), end: new Date(Date.now() + 86400000).toISOString(), type: 'CALL', status: 'PENDING'
+    }
+];
+
 interface GlobalStateContextType {
     negotiations: Negotiation[];
     updateNegotiation: (updated: Negotiation) => void;
@@ -129,6 +138,11 @@ interface GlobalStateContextType {
     financialMetrics: FinancialMetrics;
     addTransaction: (tx: Transaction) => void;
     updateFinancialMetrics: (metrics: FinancialMetrics) => void;
+
+    calendarEvents: CalendarEvent[];
+    addCalendarEvent: (event: CalendarEvent) => void;
+    updateCalendarEvent: (event: CalendarEvent) => void;
+    deleteCalendarEvent: (eventId: string) => void;
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
@@ -137,6 +151,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics>(INITIAL_METRICS);
+
+    const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
     // Load from LocalStorage on mount
     useEffect(() => {
@@ -158,6 +174,12 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
             try { setFinancialMetrics(JSON.parse(savedMetrics)); } catch (e) { setFinancialMetrics(INITIAL_METRICS); }
         } else { setFinancialMetrics(INITIAL_METRICS); }
 
+        // Calendar Events
+        const savedEvents = localStorage.getItem('obsidian_events');
+        if (savedEvents) {
+            try { setCalendarEvents(JSON.parse(savedEvents)); } catch (e) { setCalendarEvents(INITIAL_EVENTS); }
+        } else { setCalendarEvents(INITIAL_EVENTS); }
+
     }, []);
 
     // Save to LocalStorage whenever changes
@@ -175,6 +197,10 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     useEffect(() => {
         localStorage.setItem('obsidian_metrics', JSON.stringify(financialMetrics));
     }, [financialMetrics]);
+
+    useEffect(() => {
+        if (calendarEvents.length > 0) localStorage.setItem('obsidian_events', JSON.stringify(calendarEvents));
+    }, [calendarEvents]);
 
     const updateNegotiation = (updated: Negotiation) => {
         setNegotiations(prev => prev.map(n => n.id === updated.id ? updated : n));
@@ -199,10 +225,23 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         setFinancialMetrics(metrics);
     };
 
+    const addCalendarEvent = (event: CalendarEvent) => {
+        setCalendarEvents(prev => [...prev, event]);
+    };
+
+    const updateCalendarEvent = (updated: CalendarEvent) => {
+        setCalendarEvents(prev => prev.map(ev => ev.id === updated.id ? updated : ev));
+    };
+
+    const deleteCalendarEvent = (eventId: string) => {
+        setCalendarEvents(prev => prev.filter(ev => ev.id !== eventId));
+    };
+
     return (
         <GlobalStateContext.Provider value={{
             negotiations, updateNegotiation,
-            transactions, financialMetrics, addTransaction, updateFinancialMetrics
+            transactions, financialMetrics, addTransaction, updateFinancialMetrics,
+            calendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent
         }}>
             {children}
         </GlobalStateContext.Provider>

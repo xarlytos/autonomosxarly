@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ObsidianCard, ObsidianButton, ObsidianSlider, ObsidianSwitch } from './ui/ObsidianElements';
 import { Terminal, MoveRight, Sparkles, AlertTriangle, Play, TrendingUp, BarChart3, Activity, Layers, ArrowRight, Zap, Target, History, RotateCcw, HelpCircle, Download, Save, X, Trash2, Info } from 'lucide-react';
 import { useDTOLab } from '../hooks/useDTOLab';
+import { HelpIcon } from './Help/HelpIcon';
+import { GLOSSARY } from '../data/glossary';
 
 // Componente Tooltip
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
@@ -245,15 +247,17 @@ const DTOLab: React.FC = () => {
           <div>
             <h1 className="text-xl font-light text-white tracking-widest flex items-center gap-2">
               <Target className="text-obsidian-accent" size={20} />
-              DTO LAB <span className="text-obsidian-text-muted text-sm font-normal">GEMELO DIGITAL</span>
+              SIMULADOR DE ESCENARIOS
+              <HelpIcon
+                term="Simulador de Escenarios"
+                content="Herramienta que simula escenarios futuros usando Monte Carlo con 10,000 iteraciones. Visualiza el 'Cono de Incertidumbre' para tomar decisiones informadas."
+                size={16}
+              />
             </h1>
-            <p className="text-xs text-obsidian-text-muted mt-1">Simulación Monte Carlo y Escenarios Futuros</p>
+            <p className="text-xs text-obsidian-text-muted mt-1">
+              Simulación <HelpIcon term={GLOSSARY['monte-carlo'].term} content={GLOSSARY['monte-carlo'].shortDefinition} size={12} /> y Escenarios Futuros
+            </p>
           </div>
-          <Tooltip text="El DTO Lab te permite simular escenarios futuros usando Monte Carlo con 10,000 iteraciones. Ajusta los parámetros y visualiza el 'Cono de Incertidumbre' para tomar decisiones informadas.">
-            <button className="text-obsidian-text-muted hover:text-obsidian-accent transition-colors">
-              <HelpCircle size={18} />
-            </button>
-          </Tooltip>
         </div>
         <div className="flex gap-2">
           <ObsidianButton variant="secondary" className="text-xs" onClick={() => setShowHelp(!showHelp)}>
@@ -483,15 +487,15 @@ const DTOLab: React.FC = () => {
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center" onClick={() => setShowHelp(false)}>
           <div className="bg-[#16161A] border border-white/10 rounded-lg p-6 max-w-2xl m-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-light text-white">Guía de Uso - DTO Lab</h2>
+              <h2 className="text-lg font-light text-white">Guía de Uso - Simulador de Escenarios</h2>
               <button onClick={() => setShowHelp(false)} className="text-obsidian-text-muted hover:text-white">
                 <X size={20} />
               </button>
             </div>
             <div className="space-y-4 text-sm text-obsidian-text-primary">
               <div>
-                <h3 className="text-obsidian-accent font-medium mb-2">¿Qué es el DTO Lab?</h3>
-                <p className="text-xs">El Laboratorio de Gemelo Digital te permite simular escenarios futuros usando la metodología Monte Carlo con 10,000 iteraciones. Visualiza el "Cono de Incertidumbre" para entender los posibles resultados de tus decisiones.</p>
+                <h3 className="text-obsidian-accent font-medium mb-2">¿Qué es el Simulador de Escenarios?</h3>
+                <p className="text-xs">El Simulador de Escenarios te permite simular escenarios futuros usando la metodología Monte Carlo con 10,000 iteraciones. Visualiza el "Cono de Incertidumbre" para entender los posibles resultados de tus decisiones.</p>
               </div>
               <div>
                 <h3 className="text-obsidian-accent font-medium mb-2">Cómo usar</h3>

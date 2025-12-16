@@ -8,6 +8,85 @@ import {
 import { ObsidianCard, ObsidianButton } from './ui/ObsidianElements';
 import type { Email } from '../types';
 
+// --- TYPES ---
+type EmailTemplate = {
+    id: string;
+    label: string;
+    subject: string;
+    body: string;
+    icon: any;
+};
+
+const EMAIL_TEMPLATES: EmailTemplate[] = [
+    {
+        id: 'welcome',
+        label: 'Bienvenida VIP',
+        icon: Star,
+        subject: '¡Bienvenido a [Empresa]! - Primeros pasos',
+        body: `Hola [Nombre],
+
+¡Es un placer darte la bienvenida! Estamos emocionados de tenerte con nosotros.
+
+Aquí tienes algunos recursos para empezar:
+1. ...
+2. ...
+
+Si tienes alguna duda, responde a este correo.
+
+Saludos,
+El equipo.`
+    },
+    {
+        id: 'followup',
+        label: 'Seguimiento Lead',
+        icon: User,
+        subject: 'Sigues interesado en [Producto]?',
+        body: `Hola [Nombre],
+
+Vi que mostraste interés en nuestro [Producto/Servicio] recientemente pero no hemos tenido la oportunidad de conversar.
+
+¿Tienes 10 minutos esta semana para una llamada rápida? Me gustaría entender mejor tus necesidades.
+
+Agenda aquí: [Link]
+
+Un saludo.`
+    },
+    {
+        id: 'newsletter',
+        label: 'Newsletter Semanal',
+        icon: Layout,
+        subject: 'Novedades de la semana: [Tema Principal]',
+        body: `¡Hola a todos!
+
+Esta semana traemos novedades importantes:
+
+🚀 **Lanzamiento:** ...
+
+💡 **Tip de la semana:** ...
+
+📰 **Noticias del sector:** ...
+
+¡Hasta la próxima semana!
+[Tu Nombre]`
+    },
+    {
+        id: 'reactivation',
+        label: 'Reactivación',
+        icon: Clock,
+        subject: 'Te extrañamos en [Empresa]',
+        body: `Hola [Nombre],
+
+Hace tiempo que no sabemos de ti. Hemos lanzado varias mejoras que podrían interesarte:
+
+- Mejora 1
+- Mejora 2
+
+¿Te gustaría ver una demo de lo nuevo?
+
+Saludos.`
+    }
+];
+
 // --- MOCK DATA ---
 const MOCK_EMAILS: Email[] = [
     {
@@ -260,9 +339,48 @@ const EmailHub: React.FC = () => {
                     <div className="bg-[#16161A] border border-white/10 w-full max-w-2xl rounded-xl shadow-2xl flex flex-col h-[600px] animate-[slideUp_0.3s_ease-out]">
                         <div className="flex items-center justify-between p-4 border-b border-white/5">
                             <h3 className="text-sm font-medium text-white">Nuevo Mensaje</h3>
-                            <button onClick={() => setShowCompose(false)} className="text-obsidian-text-muted hover:text-white"><ArrowLeft size={16} /></button>
+                            <button
+                                onClick={() => {
+                                    if (composeData.subject || composeData.body) {
+                                        setComposeData(prev => ({ ...prev, subject: '', body: '' }));
+                                    } else {
+                                        setShowCompose(false);
+                                    }
+                                }}
+                                className="text-obsidian-text-muted hover:text-white"
+                            >
+                                <ArrowLeft size={16} />
+                            </button>
                         </div>
                         <div className="p-6 space-y-4 flex-1 overflow-y-auto">
+                            {/* Template Selector */}
+                            {!composeData.subject && !composeData.body && (
+                                <div className="mb-6">
+                                    <h4 className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-3">Plantillas Rápidas</h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {EMAIL_TEMPLATES.map(template => (
+                                            <button
+                                                key={template.id}
+                                                onClick={() => setComposeData(prev => ({ ...prev, subject: template.subject, body: template.body }))}
+                                                className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-obsidian-accent/30 transition-all text-left group"
+                                            >
+                                                <div className="p-2 rounded bg-[#0B0B0D] text-obsidian-text-muted group-hover:text-obsidian-accent transition-colors">
+                                                    <template.icon size={16} />
+                                                </div>
+                                                <div>
+                                                    <span className="text-sm font-medium text-white block">{template.label}</span>
+                                                    <span className="text-[10px] text-obsidian-text-muted block truncate w-32">{template.subject}</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="relative my-6">
+                                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+                                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#16161A] px-2 text-obsidian-text-muted">O escribe desde cero</span></div>
+                                    </div>
+                                </div>
+                            )}
+
                             <input
                                 placeholder="Para:"
                                 className="w-full bg-transparent border-b border-white/5 py-2 text-sm text-white focus:border-obsidian-accent outline-none"
@@ -275,7 +393,7 @@ const EmailHub: React.FC = () => {
                             />
                             <textarea
                                 placeholder="Escribe tu mensaje..."
-                                className="w-full h-full bg-transparent resize-none outline-none text-sm text-gray-300 leading-relaxed mt-4"
+                                className="w-full h-full bg-transparent resize-none outline-none text-sm text-gray-300 leading-relaxed mt-4 min-h-[200px]"
                                 value={composeData.body} onChange={e => setComposeData({ ...composeData, body: e.target.value })}
                             />
                         </div>
