@@ -294,8 +294,8 @@ const Funnels: React.FC = () => {
                                     key={template.id}
                                     onClick={() => setSelectedTemplate(template.id)}
                                     className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col h-full ${selectedTemplate === template.id
-                                            ? 'bg-obsidian-accent/10 border-obsidian-accent shadow-[0_0_15px_rgba(106,79,251,0.2)]'
-                                            : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'
+                                        ? 'bg-obsidian-accent/10 border-obsidian-accent shadow-[0_0_15px_rgba(106,79,251,0.2)]'
+                                        : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'
                                         }`}
                                 >
                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${template.id === selectedTemplate ? 'bg-obsidian-accent text-white' : 'bg-[#0B0B0D] text-gray-400'}`}>
@@ -384,7 +384,7 @@ const Funnels: React.FC = () => {
                             {/* Builder Actions */}
                             <div className="flex bg-[#0B0B0D] rounded-lg p-1 border border-white/10">
                                 <button className="px-3 py-1 rounded text-xs bg-obsidian-accent/20 text-white font-medium">Editor</button>
-                                <button className="px-3 py-1 rounded text-xs text-obsidian-text-muted hover:text-white transition-colors">Stats</button>
+                                <button className="px-3 py-1 rounded text-xs text-obsidian-text-muted hover:text-white transition-colors">Estadísticas</button>
                             </div>
                             <ObsidianButton variant="secondary" onClick={() => activeFunnel && handleDuplicateFunnel({} as any, activeFunnel)}>
                                 <Copy size={16} className="mr-2" /> Clonar
@@ -415,7 +415,7 @@ const Funnels: React.FC = () => {
                                 ].map((stat, i) => (
                                     <ObsidianCard key={i} className="p-4 flex items-center justify-between group hover:border-obsidian-accent/30 transition-all">
                                         <div>
-                                            <p className="text-[10px] text-obsidian-text-muted uppercase tracking-wider mb-1">{stat.label}</p>
+                                            <p className="text-[10px] text-obsidian-text-muted uppercase tracking-wider mb-1">{stat.label === 'Total Revenue' ? 'Ingresos Totales' : stat.label === 'Avg. Conversion' ? 'Conversión Promedio' : stat.label === 'Active Funnels' ? 'Funnels Activos' : 'Total de Pasos'}</p>
                                             <h3 className="text-2xl font-light text-white">{stat.value}</h3>
                                         </div>
                                         <div className={`p-3 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors ${stat.color}`}>

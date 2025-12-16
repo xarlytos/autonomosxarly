@@ -10,8 +10,11 @@ interface SwarmStatusPanelProps {
 
 const getStatusColor = (status: string) => {
   switch (status) {
+    case 'activo':
     case 'active': return 'text-obsidian-success';
+    case 'pausado':
     case 'paused': return 'text-yellow-400';
+    case 'detenido':
     case 'stopped': return 'text-red-400';
     default: return 'text-obsidian-text-muted';
   }
@@ -19,9 +22,13 @@ const getStatusColor = (status: string) => {
 
 const getPerformanceColor = (performance: string) => {
   switch (performance) {
+    case 'excelente':
     case 'excellent': return 'text-obsidian-success';
+    case 'bueno':
     case 'good': return 'text-blue-400';
+    case 'promedio':
     case 'average': return 'text-yellow-400';
+    case 'pobre':
     case 'poor': return 'text-red-400';
     default: return 'text-obsidian-text-muted';
   }
@@ -110,7 +117,7 @@ const SwarmCard: React.FC<{ swarm: Swarm; onControl?: (action: 'pause' | 'resume
 
           {onControl && (
             <div className="flex gap-2 pt-2">
-              {swarm.status === 'active' ? (
+              {(swarm.status === 'active' || swarm.status === 'activo') ? (
                 <button
                   onClick={() => onControl('pause')}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 border border-yellow-400/30 text-yellow-400 text-[10px] uppercase tracking-wider hover:bg-yellow-400/10 transition-colors rounded"
@@ -118,7 +125,7 @@ const SwarmCard: React.FC<{ swarm: Swarm; onControl?: (action: 'pause' | 'resume
                   <Pause size={12} />
                   Pausar
                 </button>
-              ) : swarm.status === 'paused' ? (
+              ) : (swarm.status === 'paused' || swarm.status === 'pausado') ? (
                 <button
                   onClick={() => onControl('resume')}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 border border-obsidian-success/30 text-obsidian-success text-[10px] uppercase tracking-wider hover:bg-obsidian-success/10 transition-colors rounded"

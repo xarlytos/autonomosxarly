@@ -155,7 +155,7 @@ export const CalendarManager: React.FC = () => {
 
                 <div className="flex items-center gap-3">
                     <ObsidianButton variant="outline" size="sm" className="hidden lg:flex">
-                        <RefreshCw size={14} className="mr-2" /> Sync
+                        <RefreshCw size={14} className="mr-2" /> Sincronizar
                     </ObsidianButton>
                     <ObsidianButton variant="outline" size="sm">
                         <Filter size={14} className="mr-2" /> Filtrar

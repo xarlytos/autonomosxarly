@@ -153,7 +153,7 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
               onClick={() => setActiveTab('overview')}
               className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'overview' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
             >
-              Overview
+              Resumen
             </button>
             <button
               onClick={() => setActiveTab('swarms')}

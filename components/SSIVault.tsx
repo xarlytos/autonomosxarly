@@ -499,7 +499,7 @@ const SSIVault: React.FC = () => {
             <div className="relative p-6 z-10">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-obsidian-text-muted uppercase tracking-[0.2em] mb-1">Master Identity</span>
+                  <span className="text-[10px] text-obsidian-text-muted uppercase tracking-[0.2em] mb-1">Identidad Maestra</span>
                   <h2 className="text-xl text-white font-light">{MASTER_IDENTITY.organization}</h2>
                   <p className="text-xs text-obsidian-text-muted mt-1">{MASTER_IDENTITY.name}</p>
                 </div>
@@ -562,7 +562,7 @@ const SSIVault: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 mb-4 relative z-10">
               <div className={`w-2 h-2 rounded-full ${hardwareStatus === 'CONNECTED' ? 'bg-obsidian-accent shadow-[0_0_8px_rgba(106,79,251,0.5)]' : 'bg-red-500'}`}></div>
-              <span className="text-xs uppercase tracking-[0.2em] text-white font-medium">Hardware Wallet Bridge</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-white font-medium">Puente Hardware Wallet</span>
             </div>
 
             <div className="space-y-4 relative z-10">
@@ -578,7 +578,7 @@ const SSIVault: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-obsidian-text-secondary">Require Hardware Signature</span>
+                <span className="text-xs text-obsidian-text-secondary">Requerir Firma Hardware</span>
                 <div className="w-10 h-5 bg-obsidian-accent/30 rounded-full relative cursor-pointer border border-obsidian-accent/50">
                   <div className="absolute right-0.5 top-0.5 w-3.5 h-3.5 bg-obsidian-accent rounded-full shadow-sm"></div>
                 </div>
@@ -599,13 +599,13 @@ const SSIVault: React.FC = () => {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-white/5 rounded">
-                <p className="text-[10px] text-obsidian-text-muted uppercase">Total Interactions</p>
+                <p className="text-[10px] text-obsidian-text-muted uppercase">Total Interacciones</p>
                 <p className="text-2xl text-white font-light mt-1">
                   {SAMPLE_PASSPORTS.reduce((sum, p) => sum + p.interactions, 0).toLocaleString()}
                 </p>
               </div>
               <div className="p-3 bg-white/5 rounded">
-                <p className="text-[10px] text-obsidian-text-muted uppercase">Avg Success Rate</p>
+                <p className="text-[10px] text-obsidian-text-muted uppercase">Tasa de Éxito Promedio</p>
                 <p className="text-2xl text-green-500 font-light mt-1">
                   {(SAMPLE_PASSPORTS.reduce((sum, p) => sum + p.successRate, 0) / SAMPLE_PASSPORTS.length).toFixed(1)}%
                 </p>
@@ -618,25 +618,25 @@ const SSIVault: React.FC = () => {
         <div className="w-1/2 flex flex-col gap-6">
           <ObsidianCard>
             <h3 className="text-sm text-white mb-4 flex items-center gap-2">
-              Identity Actions
+              Acciones de Identidad
               <HelpIcon content="Acciones para gestionar la identidad digital soberana (SSI) y credenciales verificables." size={12} />
             </h3>
             <div className="space-y-3">
               <ObsidianButton className="w-full justify-start" variant="outline">
                 <RefreshCw size={14} />
-                Sync with Blockchain
+                Sincronizar con Blockchain
               </ObsidianButton>
               <ObsidianButton className="w-full justify-start" variant="outline">
                 <QrCode size={14} />
-                Export Verifiable Credential
+                Exportar Credencial Verificable
               </ObsidianButton>
               <ObsidianButton className="w-full justify-start" variant="outline">
                 <Shield size={14} />
-                Request External Attestation
+                Solicitar Atestación Externa
               </ObsidianButton>
               <ObsidianButton className="w-full justify-start" variant="outline">
                 <Key size={14} />
-                Rotate Public Key
+                Rotar Clave Pública
               </ObsidianButton>
             </div>
           </ObsidianCard>
@@ -644,7 +644,7 @@ const SSIVault: React.FC = () => {
           <ObsidianCard className="flex-1">
             <h3 className="text-sm text-white mb-4 flex items-center gap-2">
               <Award size={14} />
-              Recent Identity Events
+              Eventos de Identidad Recientes
             </h3>
             <div className="space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100% - 40px)' }}>
               {REPUTATION_EVENTS.slice(0, 10).map(event => (
@@ -695,29 +695,29 @@ const SSIVault: React.FC = () => {
             </h2>
             <ObsidianButton onClick={() => setShowNewPassportForm(true)}>
               <Plus size={14} />
-              Issue New Passport
+              Emitir Nuevo Pasaporte
             </ObsidianButton>
           </div>
 
           {/* New Passport Form */}
           {showNewPassportForm && (
             <ObsidianCard className="border border-obsidian-accent/30">
-              <h3 className="text-sm text-white mb-4">Issue New Agent Passport</h3>
+              <h3 className="text-sm text-white mb-4">Emitir Nuevo Pasaporte de Agente</h3>
               <div className="space-y-3">
                 <ObsidianInput
-                  label="Agent Name"
+                  label="Nombre del Agente"
                   value={newPassportForm.agentName}
                   onChange={(e) => setNewPassportForm({ ...newPassportForm, agentName: e.target.value })}
                   placeholder="e.g., Agent-42"
                 />
                 <ObsidianInput
-                  label="Role"
+                  label="Rol"
                   value={newPassportForm.role}
                   onChange={(e) => setNewPassportForm({ ...newPassportForm, role: e.target.value })}
                   placeholder="e.g., Sales Assistant"
                 />
                 <div>
-                  <label className="text-xs text-obsidian-text-muted block mb-2">Permissions</label>
+                  <label className="text-xs text-obsidian-text-muted block mb-2">Permisos</label>
                   <div className="space-y-2">
                     {['read_data', 'write_data', 'execute_transactions', 'access_secrets', 'modify_settings'].map(perm => (
                       <label key={perm} className="flex items-center gap-2 text-xs cursor-pointer">
@@ -729,11 +729,11 @@ const SSIVault: React.FC = () => {
                 </div>
                 <div className="flex gap-2 pt-2">
                   <ObsidianButton className="flex-1" variant="outline" onClick={() => setShowNewPassportForm(false)}>
-                    Cancel
+                    Cancelar
                   </ObsidianButton>
                   <ObsidianButton className="flex-1">
                     <Key size={14} />
-                    Issue & Sign
+                    Emitir y Firmar
                   </ObsidianButton>
                 </div>
               </div>

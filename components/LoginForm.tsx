@@ -41,23 +41,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, isLoading, error }) => {
         <div className="mb-12 text-center relative">
           <div className="inline-flex items-center gap-2 mb-6 border border-white/[0.08] bg-white/[0.02] px-3 py-1 rounded-full">
             <div className="w-1.5 h-1.5 rounded-full bg-obsidian-success shadow-[0_0_8px_#2ECC71]"></div>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-obsidian-text-secondary font-medium">System Secure</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-obsidian-text-secondary font-medium">Sistema Seguro</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-thin text-white tracking-tight mb-3">
             Obsidian<span className="text-obsidian-text-muted">.</span>
           </h1>
           <p className="text-obsidian-text-muted text-xs font-light tracking-wide">
-            ADVANCED CRM INTELLIGENCE
+            INTELIGENCIA CRM AVANZADA
           </p>
         </div>
 
         {/* Form Section */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <ObsidianInput
-            label="Identity"
+            label="Identidad"
             type="email"
-            placeholder="user@obsidian.ai"
+            placeholder="usuario@obsidian.ai"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail size={16} strokeWidth={1} />}
@@ -65,7 +65,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, isLoading, error }) => {
           />
 
           <ObsidianInput
-            label="Passkey"
+            label="Contraseña"
             type="password"
             placeholder="••••••••••••"
             value={pass}
@@ -83,23 +83,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, isLoading, error }) => {
 
           <div className="pt-4">
             <ObsidianButton type="submit" isLoading={isLoading}>
-              <span className="mr-2 uppercase tracking-[0.15em] text-[11px] font-medium">Authenticate</span>
+              <span className="mr-2 uppercase tracking-[0.15em] text-[11px] font-medium">Autenticar</span>
               {!isLoading && <ArrowRight size={14} className="opacity-60" />}
             </ObsidianButton>
           </div>
 
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/[0.04]">
-             <a href="#" className="text-[10px] text-obsidian-text-muted hover:text-white transition-colors uppercase tracking-widest">
-               Forgot Access?
-             </a>
-             <div className="flex items-center gap-1 text-obsidian-text-muted/40">
-                <ShieldCheck size={12} strokeWidth={1} />
-                <span className="text-[9px] uppercase tracking-widest">TLS 1.3 Encrypted</span>
-             </div>
+            <a href="#" className="text-[10px] text-obsidian-text-muted hover:text-white transition-colors uppercase tracking-widest">
+              ¿Olvidaste el Acceso?
+            </a>
+            <div className="flex items-center gap-1 text-obsidian-text-muted/40">
+              <ShieldCheck size={12} strokeWidth={1} />
+              <span className="text-[9px] uppercase tracking-widest">Encriptado TLS 1.3</span>
+            </div>
           </div>
         </form>
       </ObsidianCard>
-      
+
       {/* Footer / Demo Link */}
       <div className="text-center mt-8 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">

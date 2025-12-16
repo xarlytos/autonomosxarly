@@ -5,15 +5,16 @@ import {
   Plus, Pause, StopCircle, PlayCircle, Eye, TrendingUp, Database,
   Users, Clock, DollarSign, CheckCircle, XCircle, ChevronRight,
   Settings, BarChart3, FileText, AlertTriangle, X, Edit2, Trash2,
-  Info, HelpCircle, Zap, Target, Scale, Save, Download
+  Info, HelpCircle, Zap, Target, Scale, Save, Download, Workflow
 } from 'lucide-react';
+import WorkflowEditorWrapper from './AutomationEditor/WorkflowEditor';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 // --- Types ---
-type SwarmType = 'research' | 'sentiment' | 'negotiation' | 'lead_generation' | 'content_creation' | 'market_analysis';
+type SwarmType = 'research' | 'sentiment' | 'negotiation' | 'lead_generation' | 'content_creation' | 'market_analysis' | 'visual_flow';
 type MissionStatus = 'IDLE' | 'DEPLOYING' | 'OPERATIONAL' | 'PAUSED' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-type ViewMode = 'dashboard' | 'detail' | 'create';
+type ViewMode = 'dashboard' | 'detail' | 'create' | 'editor';
 
 interface ConfirmationModal {
   isOpen: boolean;
@@ -172,6 +173,15 @@ const SWARM_TEMPLATES: SwarmTemplate[] = [
     defaultAgents: 220,
     capabilities: ['Market Monitoring', 'Opportunity Detection', 'Price Tracking', 'Competitor Intelligence']
   },
+  {
+    id: 'visual_flow',
+    name: 'Flujo Personalizado',
+    description: 'Automatización diseñada visualmente con lógica personalizada.',
+    icon: <Workflow size={18} />,
+    estimatedCost: 'Variable',
+    defaultAgents: 50,
+    capabilities: ['Custom Logic', 'Multi-step Workflow', 'Conditional Execution', 'API Integration']
+  },
 ];
 
 // --- System Presets (Phase 8) ---
@@ -261,7 +271,8 @@ function generateTaskForSwarmType(swarmType: SwarmType, status: AgentStatus): st
     negotiation: ['Reviewing contract terms', 'Calculating optimal offer', 'Drafting counter-proposal', 'Analyzing deal value', 'Preparing negotiation strategy'],
     lead_generation: ['Identifying potential leads', 'Qualifying prospects', 'Enriching contact data', 'Scoring lead quality', 'Building outreach lists'],
     content_creation: ['Generating blog post', 'Creating social media copy', 'Optimizing SEO keywords', 'A/B testing headlines', 'Adapting for channels'],
-    market_analysis: ['Monitoring market trends', 'Tracking competitor prices', 'Detecting opportunities', 'Analyzing demand patterns', 'Forecasting market shifts']
+    market_analysis: ['Monitoring market trends', 'Tracking competitor prices', 'Detecting opportunities', 'Analyzing demand patterns', 'Forecasting market shifts'],
+    visual_flow: ['Executing Node #1', 'Evaluating Condition', 'Waiting for Delay', 'Firing Webhook', 'Processing Action']
   };
 
   const taskList = tasks[swarmType] || ['Processing data'];
@@ -341,6 +352,11 @@ function generateResultTitle(swarmType: SwarmType, type: 'report' | 'data' | 'in
       report: ['Market Trends Report', 'Competitive Landscape', 'Demand Forecast', 'Price Analysis'],
       data: ['Market Size Data', 'Competitor Pricing', 'Demand Patterns', 'Growth Indicators'],
       insight: ['Market Shift Detected', 'Price Opportunity', 'Demand Surge', 'Competitive Threat']
+    },
+    visual_flow: {
+      report: ['Workflow Execution Log', 'Step-by-Step Analysis', 'Error Report', 'Performance Summary'],
+      data: ['Node Outputs', 'Variable State', 'Execution Metrics', 'API Responses'],
+      insight: ['Optimization Warning', 'Logic Loop Detected', 'Bottleneck Identified', 'Success Rate Drop']
     }
   };
 
@@ -537,7 +553,7 @@ const SwarmOrchestrator: React.FC = () => {
     const numParticles = Math.min(selectedMission.agentCount, 125); // Visual representation, max 125 for performance
     const agents = selectedMission.agents || [];
 
-    for(let i=0; i<numParticles; i++) {
+    for (let i = 0; i < numParticles; i++) {
       const agent = agents[i];
       particles.push({
         x: canvas.width / 4,
@@ -616,9 +632,9 @@ const SwarmOrchestrator: React.FC = () => {
         const currentZone = zones[Math.floor(Math.abs(Math.sin(p.phase)) * zones.length)];
 
         if (currentZone) {
-          const dx = currentZone.x + Math.cos(time + p.phase)*currentZone.r*0.8 - p.x;
-          const dy = currentZone.y + Math.sin(time + p.phase)*currentZone.r*0.8 - p.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
+          const dx = currentZone.x + Math.cos(time + p.phase) * currentZone.r * 0.8 - p.x;
+          const dy = currentZone.y + Math.sin(time + p.phase) * currentZone.r * 0.8 - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist > 5) {
             p.x += (dx / dist) * p.speed;
@@ -651,14 +667,14 @@ const SwarmOrchestrator: React.FC = () => {
         }
 
         ctx.beginPath();
-        ctx.moveTo(p.x - (Math.cos(time)*5), p.y - (Math.sin(time)*5));
+        ctx.moveTo(p.x - (Math.cos(time) * 5), p.y - (Math.sin(time) * 5));
         ctx.lineTo(p.x, p.y);
         ctx.strokeStyle = `${particleColor}33`; // 20% opacity
         ctx.lineWidth = 1;
         ctx.stroke();
 
         ctx.fillStyle = particleColor;
-        ctx.fillRect(p.x - size/2, p.y - size/2, size, size);
+        ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
 
         if (isHovered || isSelected) {
           ctx.shadowBlur = 0;
@@ -1312,7 +1328,7 @@ const SwarmOrchestrator: React.FC = () => {
       case 'PAUSED': return <Pause size={12} />;
       case 'COMPLETED': return <CheckCircle size={12} />;
       case 'FAILED': return <XCircle size={12} />;
-      case 'CANCELLED': return <X Circle size={12} />;
+      case 'CANCELLED': return <XCircle size={12} />;
       default: return <StopCircle size={12} />;
     }
   };
@@ -1343,11 +1359,11 @@ const SwarmOrchestrator: React.FC = () => {
             >
               <HelpCircle size={20} className="text-obsidian-text-muted hover:text-white transition-colors" />
             </button>
-            <ObsidianButton
-              onClick={() => setViewMode('create')}
-              icon={<Plus size={16} />}
-            >
-              Nueva Misión
+            <ObsidianButton onClick={() => setViewMode('create')}>
+              <div className="flex items-center gap-2">
+                <Plus size={16} />
+                <span>Nueva Misión</span>
+              </div>
             </ObsidianButton>
           </div>
         </div>
@@ -1357,21 +1373,19 @@ const SwarmOrchestrator: React.FC = () => {
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setDashboardTab('active')}
-          className={`px-4 py-2 rounded-lg text-sm transition-all ${
-            dashboardTab === 'active'
-              ? 'bg-obsidian-accent/20 border border-obsidian-accent/50 text-white'
-              : 'border border-white/[0.1] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
-          }`}
+          className={`px-4 py-2 rounded-lg text-sm transition-all ${dashboardTab === 'active'
+            ? 'bg-obsidian-accent/20 border border-obsidian-accent/50 text-white'
+            : 'border border-white/[0.1] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
+            }`}
         >
           Activas ({missions.length})
         </button>
         <button
           onClick={() => setDashboardTab('history')}
-          className={`px-4 py-2 rounded-lg text-sm transition-all ${
-            dashboardTab === 'history'
-              ? 'bg-obsidian-accent/20 border border-obsidian-accent/50 text-white'
-              : 'border border-white/[0.1] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
-          }`}
+          className={`px-4 py-2 rounded-lg text-sm transition-all ${dashboardTab === 'history'
+            ? 'bg-obsidian-accent/20 border border-obsidian-accent/50 text-white'
+            : 'border border-white/[0.1] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
+            }`}
         >
           Historial ({missionHistory.length})
         </button>
@@ -1382,138 +1396,138 @@ const SwarmOrchestrator: React.FC = () => {
         <div className="flex-1 overflow-y-auto">
           <div className="grid grid-cols-1 gap-4 animate-[fadeIn_0.6s_ease-out_0.2s_both]">
             {missions.map(mission => (
-            <ObsidianCard key={mission.id} className="hover:bg-white/[0.02] transition-all cursor-pointer group">
-              <div className="flex gap-6">
-                {/* Left: Mission Info */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-normal text-[#F5F5F7]">{mission.name}</h3>
-                        <span className="text-[10px] text-obsidian-text-muted font-mono opacity-60">[{mission.id}]</span>
+              <ObsidianCard key={mission.id} className="hover:bg-white/[0.02] transition-all cursor-pointer group">
+                <div className="flex gap-6">
+                  {/* Left: Mission Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="text-lg font-normal text-[#F5F5F7]">{mission.name}</h3>
+                          <span className="text-[10px] text-obsidian-text-muted font-mono opacity-60">[{mission.id}]</span>
+                        </div>
+                        <p className="text-xs text-obsidian-text-muted">{mission.objective}</p>
                       </div>
-                      <p className="text-xs text-obsidian-text-muted">{mission.objective}</p>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full text-[10px] font-medium tracking-widest uppercase flex items-center gap-2 border ${getStatusColor(mission.status)}`}>
-                      {getStatusIcon(mission.status)}
-                      {mission.status}
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-obsidian-text-muted">Progreso</span>
-                      <span className="text-white">{mission.progress.toFixed(0)}%</span>
-                    </div>
-                    <div className="w-full h-1 bg-white/[0.05] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#6A4FFB] shadow-[0_0_10px_#6A4FFB] transition-all duration-300"
-                        style={{ width: `${mission.progress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* KPIs */}
-                  <div className="grid grid-cols-4 gap-4">
-                    <div>
-                      <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Tipo</div>
-                      <div className="flex items-center gap-2 text-sm text-white">
-                        {SWARM_TEMPLATES.find(t => t.id === mission.swarmType)?.icon}
-                        <span>{SWARM_TEMPLATES.find(t => t.id === mission.swarmType)?.name}</span>
+                      <div className={`px-3 py-1 rounded-full text-[10px] font-medium tracking-widest uppercase flex items-center gap-2 border ${getStatusColor(mission.status)}`}>
+                        {getStatusIcon(mission.status)}
+                        {mission.status}
                       </div>
                     </div>
-                    <div>
-                      <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Agentes</div>
-                      <div className="text-sm text-white">{mission.agentCount}</div>
+
+                    {/* Progress Bar */}
+                    <div className="mb-3">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-obsidian-text-muted">Progreso</span>
+                        <span className="text-white">{mission.progress.toFixed(0)}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#6A4FFB] shadow-[0_0_10px_#6A4FFB] transition-all duration-300"
+                          style={{ width: `${mission.progress}%` }}
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Tareas</div>
-                      <div className="text-sm text-white">{mission.kpis.tasksCompleted}</div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Coste</div>
-                      <div className="text-sm text-white">${mission.cost.toFixed(2)}</div>
+
+                    {/* KPIs */}
+                    <div className="grid grid-cols-4 gap-4">
+                      <div>
+                        <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Tipo</div>
+                        <div className="flex items-center gap-2 text-sm text-white">
+                          {SWARM_TEMPLATES.find(t => t.id === mission.swarmType)?.icon}
+                          <span>{SWARM_TEMPLATES.find(t => t.id === mission.swarmType)?.name}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Agentes</div>
+                        <div className="text-sm text-white">{mission.agentCount}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Tareas</div>
+                        <div className="text-sm text-white">{mission.kpis.tasksCompleted}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-obsidian-text-muted uppercase mb-1">Coste</div>
+                        <div className="text-sm text-white">${mission.cost.toFixed(2)}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right: Actions */}
-                <div className="flex flex-col justify-between items-end">
-                  <button
-                    onClick={() => handleViewMissionDetail(mission.id)}
-                    className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Eye size={16} className="text-white" />
-                  </button>
+                  {/* Right: Actions */}
+                  <div className="flex flex-col justify-between items-end">
+                    <button
+                      onClick={() => handleViewMissionDetail(mission.id)}
+                      className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Eye size={16} className="text-white" />
+                    </button>
 
-                  <div className="flex gap-2">
-                    {mission.status === 'IDLE' && (
-                      <button
-                        onClick={() => showConfirmation(mission.id, 'start')}
-                        className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all"
-                        title="Iniciar"
-                      >
-                        <PlayCircle size={14} className="text-[#45FF9A]" />
-                      </button>
-                    )}
-                    {mission.status === 'OPERATIONAL' && (
-                      <button
-                        onClick={() => showConfirmation(mission.id, 'pause')}
-                        className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all"
-                        title="Pausar"
-                      >
-                        <Pause size={14} className="text-yellow-400" />
-                      </button>
-                    )}
-                    {mission.status === 'PAUSED' && (
-                      <>
+                    <div className="flex gap-2">
+                      {mission.status === 'IDLE' && (
                         <button
-                          onClick={() => showConfirmation(mission.id, 'resume')}
+                          onClick={() => showConfirmation(mission.id, 'start')}
                           className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all"
-                          title="Reanudar"
+                          title="Iniciar"
                         >
                           <PlayCircle size={14} className="text-[#45FF9A]" />
                         </button>
+                      )}
+                      {mission.status === 'OPERATIONAL' && (
                         <button
-                          onClick={() => showConfirmation(mission.id, 'cancel')}
-                          className="p-2 rounded-lg border border-white/[0.1] hover:bg-red-500/[0.1] transition-all"
-                          title="Cancelar"
+                          onClick={() => showConfirmation(mission.id, 'pause')}
+                          className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all"
+                          title="Pausar"
                         >
-                          <X size={14} className="text-red-400" />
+                          <Pause size={14} className="text-yellow-400" />
                         </button>
-                      </>
-                    )}
-                    {['OPERATIONAL', 'PAUSED'].includes(mission.status) && (
-                      <button
-                        onClick={() => showConfirmation(mission.id, 'stop')}
-                        className="p-2 rounded-lg border border-white/[0.1] hover:bg-red-500/[0.1] transition-all"
-                        title="Detener"
-                      >
-                        <StopCircle size={14} className="text-red-400" />
-                      </button>
-                    )}
+                      )}
+                      {mission.status === 'PAUSED' && (
+                        <>
+                          <button
+                            onClick={() => showConfirmation(mission.id, 'resume')}
+                            className="p-2 rounded-lg border border-white/[0.1] hover:bg-white/[0.05] transition-all"
+                            title="Reanudar"
+                          >
+                            <PlayCircle size={14} className="text-[#45FF9A]" />
+                          </button>
+                          <button
+                            onClick={() => showConfirmation(mission.id, 'cancel')}
+                            className="p-2 rounded-lg border border-white/[0.1] hover:bg-red-500/[0.1] transition-all"
+                            title="Cancelar"
+                          >
+                            <X size={14} className="text-red-400" />
+                          </button>
+                        </>
+                      )}
+                      {['OPERATIONAL', 'PAUSED'].includes(mission.status) && (
+                        <button
+                          onClick={() => showConfirmation(mission.id, 'stop')}
+                          className="p-2 rounded-lg border border-white/[0.1] hover:bg-red-500/[0.1] transition-all"
+                          title="Detener"
+                        >
+                          <StopCircle size={14} className="text-red-400" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ObsidianCard>
-          ))}
-        </div>
-
-        {missions.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-obsidian-text-muted">
-            <Radio size={48} className="mb-4 opacity-20" />
-            <p className="text-sm">No hay misiones activas</p>
-            <button
-              onClick={() => setViewMode('create')}
-              className="mt-4 text-obsidian-accent hover:text-obsidian-accent-dark text-sm flex items-center gap-2"
-            >
-              <Plus size={16} />
-              Crear primera misión
-            </button>
+              </ObsidianCard>
+            ))}
           </div>
-        )}
-      </div>
+
+          {missions.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-obsidian-text-muted">
+              <Radio size={48} className="mb-4 opacity-20" />
+              <p className="text-sm">No hay misiones activas</p>
+              <button
+                onClick={() => setViewMode('create')}
+                className="mt-4 text-obsidian-accent hover:text-obsidian-accent-dark text-sm flex items-center gap-2"
+              >
+                <Plus size={16} />
+                Crear primera misión
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* History Tab (Phase 5) */}
@@ -1552,11 +1566,10 @@ const SwarmOrchestrator: React.FC = () => {
                 <button
                   key={filter}
                   onClick={() => setHistoryFilter(filter)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                    historyFilter === filter
-                      ? 'bg-white/[0.1] border border-white/[0.15] text-white'
-                      : 'border border-white/[0.08] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${historyFilter === filter
+                    ? 'bg-white/[0.1] border border-white/[0.15] text-white'
+                    : 'border border-white/[0.08] text-obsidian-text-muted hover:text-white hover:bg-white/[0.05]'
+                    }`}
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
                 </button>
@@ -1977,14 +1990,15 @@ const SwarmOrchestrator: React.FC = () => {
             >
               Cancelar
             </button>
-            <ObsidianButton
-              onClick={handleCreateMission}
-              icon={<PlayCircle size={16} />}
-            >
-              Desplegar Misión
+            <ObsidianButton onClick={handleCreateMission}>
+              <div className="flex items-center gap-2">
+                <PlayCircle size={16} />
+                <span>Desplegar Misión</span>
+              </div>
             </ObsidianButton>
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -2065,7 +2079,7 @@ const SwarmOrchestrator: React.FC = () => {
                 </button>
               )}
 
-              {/* Export Button (Phase 6) */}
+              {/* Export Button */}
               <div className="relative">
                 <button
                   onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
@@ -2256,9 +2270,8 @@ const SwarmOrchestrator: React.FC = () => {
 
                         {expanded && (
                           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-                            <div className={`text-xs leading-relaxed ${
-                              result.type === 'data' ? 'font-mono bg-black/20 p-3 rounded overflow-x-auto' : 'text-obsidian-text-muted'
-                            }`}>
+                            <div className={`text-xs leading-relaxed ${result.type === 'data' ? 'font-mono bg-black/20 p-3 rounded overflow-x-auto' : 'text-obsidian-text-muted'
+                              }`}>
                               {result.content.split('\n').map((line, idx) => (
                                 <div key={idx}>{line || '\u00A0'}</div>
                               ))}
@@ -2271,6 +2284,38 @@ const SwarmOrchestrator: React.FC = () => {
                 </div>
               )}
             </ObsidianCard>
+
+            <div className="flex gap-4 items-center">
+              <ObsidianButton
+                variant="secondary"
+                onClick={() => setViewMode('editor')}
+              >
+                <div className="flex items-center gap-2">
+                  <Workflow size={16} />
+                  <span>Editor Visual</span>
+                </div>
+              </ObsidianButton>
+              <ObsidianButton
+                variant="primary"
+                onClick={() => {
+                  setCreateForm({
+                    name: '',
+                    swarmType: null,
+                    objective: '',
+                    maxAgents: 200,
+                    budget: 50,
+                    priority: 'balanced',
+                    criticalAlerts: true
+                  });
+                  setViewMode('create');
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Plus size={16} />
+                  <span>Nueva Misión</span>
+                </div>
+              </ObsidianButton>
+            </div>
           </div>
 
           {/* Right Column: Info & Logs */}
@@ -2339,11 +2384,10 @@ const SwarmOrchestrator: React.FC = () => {
                     <button
                       key={status}
                       onClick={() => setAgentFilter({ ...agentFilter, status })}
-                      className={`px-2 py-1 text-[9px] uppercase rounded border transition-all ${
-                        agentFilter.status === status
-                          ? 'bg-white/[0.1] border-white/[0.3] text-white'
-                          : 'bg-white/[0.02] border-white/[0.1] text-obsidian-text-muted hover:border-white/[0.2]'
-                      }`}
+                      className={`px-2 py-1 text-[9px] uppercase rounded border transition-all ${agentFilter.status === status
+                        ? 'bg-white/[0.1] border-white/[0.3] text-white'
+                        : 'bg-white/[0.02] border-white/[0.1] text-obsidian-text-muted hover:border-white/[0.2]'
+                        }`}
                     >
                       {status} ({count})
                     </button>
@@ -2371,11 +2415,10 @@ const SwarmOrchestrator: React.FC = () => {
                     return (
                       <div
                         key={agent.id}
-                        className={`p-2 bg-white/[0.02] rounded border transition-all cursor-pointer ${
-                          hoveredAgentId === agent.id
-                            ? 'border-obsidian-accent/50 bg-white/[0.04]'
-                            : 'border-white/[0.05] hover:border-white/[0.1]'
-                        }`}
+                        className={`p-2 bg-white/[0.02] rounded border transition-all cursor-pointer ${hoveredAgentId === agent.id
+                          ? 'border-obsidian-accent/50 bg-white/[0.04]'
+                          : 'border-white/[0.05] hover:border-white/[0.1]'
+                          }`}
                         onMouseEnter={() => setHoveredAgentId(agent.id)}
                         onMouseLeave={() => setHoveredAgentId(null)}
                         onClick={() => setSelectedAgentId(agent.id)}
@@ -2386,12 +2429,11 @@ const SwarmOrchestrator: React.FC = () => {
                             style={{ backgroundColor: agentStatusColors[agent.status] }}
                           />
                           <span className="text-[10px] font-mono text-white">{agent.id}</span>
-                          <span className={`text-[8px] uppercase px-1.5 py-0.5 rounded ${
-                            agent.status === 'working' ? 'bg-green-500/20 text-green-400' :
+                          <span className={`text-[8px] uppercase px-1.5 py-0.5 rounded ${agent.status === 'working' ? 'bg-green-500/20 text-green-400' :
                             agent.status === 'error' ? 'bg-red-500/20 text-red-400' :
-                            agent.status === 'completed' ? 'bg-blue-500/20 text-blue-400' :
-                            'bg-gray-500/20 text-gray-400'
-                          }`}>
+                              agent.status === 'completed' ? 'bg-blue-500/20 text-blue-400' :
+                                'bg-gray-500/20 text-gray-400'
+                            }`}>
                             {agent.status}
                           </span>
                         </div>
@@ -2409,7 +2451,7 @@ const SwarmOrchestrator: React.FC = () => {
             </ObsidianCard>
 
             {/* Live Logs */}
-            <ObsidianCard className="flex-shrink-0" style={{ height: '300px' }}>
+            <ObsidianCard className="flex-shrink-0 h-[300px]">
               <h3 className="text-sm font-normal text-[#F5F5F7] uppercase tracking-wider mb-4 flex items-center gap-2">
                 <FileText size={14} />
                 Logs en Tiempo Real
@@ -2427,12 +2469,12 @@ const SwarmOrchestrator: React.FC = () => {
                           {log.timestamp.toLocaleTimeString()}
                         </span>
                         <span className={`
-                          text-[9px] font-mono uppercase px-1.5 py-0.5 rounded
-                          ${log.level === 'error' ? 'bg-red-500/20 text-red-400' : ''}
-                          ${log.level === 'warning' ? 'bg-yellow-500/20 text-yellow-400' : ''}
-                          ${log.level === 'success' ? 'bg-green-500/20 text-green-400' : ''}
-                          ${log.level === 'info' ? 'bg-blue-500/20 text-blue-400' : ''}
-                        `}>
+                        text-[9px] font-mono uppercase px-1.5 py-0.5 rounded
+                        ${log.level === 'error' ? 'bg-red-500/20 text-red-400' : ''}
+                        ${log.level === 'warning' ? 'bg-yellow-500/20 text-yellow-400' : ''}
+                        ${log.level === 'success' ? 'bg-green-500/20 text-green-400' : ''}
+                        ${log.level === 'info' ? 'bg-blue-500/20 text-blue-400' : ''}
+                      `}>
                           {log.level}
                         </span>
                       </div>
@@ -2800,6 +2842,35 @@ const SwarmOrchestrator: React.FC = () => {
             return renderCreateMission();
           case 'detail':
             return renderMissionDetail();
+          case 'editor':
+            return (
+              <WorkflowEditorWrapper
+                onBack={() => setViewMode('dashboard')}
+                onRunSimulation={(nodes: any[], edges: any[]) => {
+                  const newMission: Mission = {
+                    id: `FLOW-${Date.now()}`,
+                    name: `Custom Flow ${new Date().toLocaleTimeString()}`,
+                    swarmType: 'visual_flow',
+                    status: 'DEPLOYING',
+                    progress: 0,
+                    agentCount: nodes.length * 10, // heuristic
+                    objective: `Executing custom workflow with ${nodes.length} steps`,
+                    kpis: {
+                      dataProcessed: '0 MB',
+                      tasksCompleted: 0,
+                      accuracy: 100
+                    },
+                    cost: 0,
+                    startTime: new Date(),
+                    logs: [],
+                    results: []
+                  };
+                  setMissions(prev => [newMission, ...prev]);
+                  alert('Workflow simulation started! Added to dashboard.');
+                  setViewMode('dashboard');
+                }}
+              />
+            );
           default:
             return renderDashboard();
         }

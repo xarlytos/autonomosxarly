@@ -141,7 +141,7 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ kpis }) => {
         <div className="bg-white/[0.02] border border-white/[0.04] rounded px-3 py-2.5 flex flex-col items-center group relative">
           <Cpu size={14} className="text-obsidian-text-muted mb-1.5" />
           <div className="text-[9px] text-obsidian-text-muted uppercase tracking-widest mb-0.5 flex items-center gap-1">
-            Uptime
+            Disponibilidad
             <ObsidianTooltip content="Porcentaje del tiempo que el sistema ha estado operativo sin interrupciones en el período actual. 99.9% es el objetivo estándar." position="top">
               <HelpCircle size={8} className="cursor-help opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity" />
             </ObsidianTooltip>
