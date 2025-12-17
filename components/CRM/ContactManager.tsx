@@ -155,6 +155,7 @@ export const ContactManager: React.FC = () => {
   const [selectedType, setSelectedType] = useState<ContactType | 'ALL'>('ALL');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isCreatingContact, setIsCreatingContact] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // New Contact State
   const [newContactData, setNewContactData] = useState<Partial<Contact>>({
@@ -221,31 +222,45 @@ export const ContactManager: React.FC = () => {
     setIsEventModalOpen(false);
   };
 
-  const handleCreateContact = () => {
+  const handleSaveContact = () => {
     // Basic validation
     if (!newContactData.name) return;
 
-    const newContact: Contact = {
-      id: Date.now().toString(),
-      name: newContactData.name,
-      role: newContactData.role || 'Sin Cargo',
-      company: newContactData.company || 'Sin Empresa',
-      email: newContactData.email || '',
-      phone: newContactData.phone || '',
-      type: newContactData.type || 'LEAD',
-      status: newContactData.status || 'WARM',
-      lastContact: new Date().toISOString().split('T')[0],
-      tags: newContactData.tags || [],
-      notes: newContactData.notes || '',
-      // Default / empty values for optional fields
-      ltv: 0,
-      dealSize: 0,
-      probability: 0,
-    };
+    if (isEditing && selectedContact) {
+      // Edit Mode
+      const updatedContact: Contact = {
+        ...selectedContact,
+        ...newContactData,
+        id: selectedContact.id // Ensure ID is preserved
+      };
 
-    setContacts([newContact, ...contacts]);
-    setSelectedContact(newContact);
+      setContacts(contacts.map(c => c.id === updatedContact.id ? updatedContact : c));
+      setSelectedContact(updatedContact);
+    } else {
+      // Create Mode
+      const newContact: Contact = {
+        id: Date.now().toString(),
+        name: newContactData.name,
+        role: newContactData.role || 'Sin Cargo',
+        company: newContactData.company || 'Sin Empresa',
+        email: newContactData.email || '',
+        phone: newContactData.phone || '',
+        type: newContactData.type || 'LEAD',
+        status: newContactData.status || 'WARM',
+        lastContact: new Date().toISOString().split('T')[0],
+        tags: newContactData.tags || [],
+        notes: newContactData.notes || '',
+        // Default / empty values for optional fields
+        ltv: 0,
+        dealSize: 0,
+        probability: 0,
+      };
+      setContacts([newContact, ...contacts]);
+      setSelectedContact(newContact);
+    }
+
     setIsCreatingContact(false);
+    setIsEditing(false);
     // Reset form
     setNewContactData({ type: 'LEAD', status: 'WARM', tags: [] });
   };
@@ -265,7 +280,7 @@ export const ContactManager: React.FC = () => {
             <h1 className="text-2xl font-light text-white tracking-[0.2em] uppercase drop-shadow-md">
               CRM <span className="text-obsidian-accent font-normal">NEXUS</span>
             </h1>
-            <ObsidianButton size="sm" onClick={() => setIsCreatingContact(true)} className="shadow-[0_0_20px_rgba(106,79,251,0.2)] hover:shadow-[0_0_30px_rgba(106,79,251,0.4)] transition-all">
+            <ObsidianButton size="sm" onClick={() => { setIsEditing(false); setNewContactData({ type: 'LEAD', status: 'WARM', tags: [] }); setIsCreatingContact(true); }} className="shadow-[0_0_20px_rgba(106,79,251,0.2)] hover:shadow-[0_0_30px_rgba(106,79,251,0.4)] transition-all">
               <Plus size={16} />
               <span className="ml-2 hidden sm:inline">Nuevo Contacto</span>
             </ObsidianButton>
@@ -390,10 +405,24 @@ export const ContactManager: React.FC = () => {
                     <X size={14} />
                   </ObsidianButton>
                   <div className="w-[1px] h-6 bg-white/10 mx-2 hidden lg:block"></div>
-                  <ObsidianButton variant="secondary" size="sm">
+                  <ObsidianButton variant="secondary" size="sm" onClick={() => {
+                    if (selectedContact) {
+                      setNewContactData(selectedContact);
+                      setIsEditing(true);
+                      setIsCreatingContact(true);
+                    }
+                  }}>
                     <Edit3 size={14} />
                   </ObsidianButton>
-                  <ObsidianButton variant="secondary" size="sm" className="text-red-400 hover:text-red-500 hover:bg-red-500/10">
+                  <ObsidianButton variant="secondary" size="sm"
+                    onClick={() => {
+                      if (selectedContact && window.confirm('¿Estás seguro de que deseas eliminar este contacto? Esta acción no se puede deshacer.')) {
+                        setContacts(contacts.filter(c => c.id !== selectedContact.id));
+                        setSelectedContact(null);
+                      }
+                    }}
+                    className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                  >
                     <Trash2 size={14} />
                   </ObsidianButton>
                 </div>
@@ -610,8 +639,8 @@ export const ContactManager: React.FC = () => {
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#141418]">
               <div>
-                <h2 className="text-xl font-light text-white tracking-wide">Nuevo Contacto</h2>
-                <p className="text-xs text-obsidian-text-muted mt-1">Ingresa la información básica para crear una ficha.</p>
+                <h2 className="text-xl font-light text-white tracking-wide">{isEditing ? 'Editar Contacto' : 'Nuevo Contacto'}</h2>
+                <p className="text-xs text-obsidian-text-muted mt-1">{isEditing ? 'Modifica la información del contacto.' : 'Ingresa la información básica para crear una ficha.'}</p>
               </div>
               <button onClick={() => setIsCreatingContact(false)} className="text-obsidian-text-muted hover:text-white transition-colors">
                 <X size={20} />
@@ -713,9 +742,9 @@ export const ContactManager: React.FC = () => {
               >
                 Cancelar
               </button>
-              <ObsidianButton onClick={handleCreateContact} glow>
+              <ObsidianButton onClick={handleSaveContact} glow>
                 <CheckCircle2 size={16} className="mr-2" />
-                Crear Contacto
+                {isEditing ? 'Guardar Cambios' : 'Crear Contacto'}
               </ObsidianButton>
             </div>
 

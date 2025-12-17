@@ -4,7 +4,7 @@ import {
   MessageSquareText, Hash, Send, Calendar as CalendarIcon, Image as ImageIcon,
   TrendingUp, RefreshCw, Sparkles, Globe, BarChart3,
   Twitter, Linkedin, Instagram, Facebook, Zap, CheckCircle2,
-  Clock, AlertCircle, MoreHorizontal, Plus, ArrowLeft, ChevronLeft, ChevronRight, GripVertical, List, Layout, Edit, Trash, Trash2, Inbox, MessageCircle, User, Reply, Check
+  Clock, AlertCircle, MoreHorizontal, Plus, ArrowLeft, ChevronLeft, ChevronRight, GripVertical, List, Layout, Edit, Trash, Trash2, Inbox, MessageCircle, User, Reply, Check, X
 } from 'lucide-react';
 
 // --- Types ---
@@ -78,13 +78,30 @@ const ContentSocialStudio: React.FC = () => {
 
   // Data State
   const [posts, setPosts] = useState<SocialPost[]>(() => {
-    const saved = localStorage.getItem('obsidian_social_posts');
-    return saved ? JSON.parse(saved) : INITIAL_POSTS;
+    try {
+      const saved = localStorage.getItem('obsidian_social_posts');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((p: any) => ({
+          ...p,
+          scheduledFor: p.scheduledFor ? new Date(p.scheduledFor) : undefined
+        }));
+      }
+      return INITIAL_POSTS;
+    } catch (e) {
+      console.error("Failed to parse social posts", e);
+      return INITIAL_POSTS;
+    }
   });
 
   const [inboxMessages, setInboxMessages] = useState<InboxMessage[]>(() => {
-    const saved = localStorage.getItem('obsidian_social_inbox');
-    return saved ? JSON.parse(saved) : INBOX_MESSAGES;
+    try {
+      const saved = localStorage.getItem('obsidian_social_inbox');
+      return saved ? JSON.parse(saved) : INBOX_MESSAGES;
+    } catch (e) {
+      console.error("Failed to parse inbox messages", e);
+      return INBOX_MESSAGES;
+    }
   });
 
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(INBOX_MESSAGES[0].id);
@@ -1130,8 +1147,47 @@ const ContentSocialStudio: React.FC = () => {
     </div>
   );
 
+  // Campaign State
+  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
+  const [campaignData, setCampaignData] = useState({ name: '', topic: '', platforms: ['twitter', 'linkedin'] as Platform[] });
+
+  const handleCreateCampaign = () => {
+    setIsCampaignModalOpen(false);
+
+    // Simulate campaign creation by generating drafts
+    const newPosts: SocialPost[] = [
+      {
+        id: `camp-${Date.now()}-1`,
+        content: `🚀 Iniciando nuestra campaña: ${campaignData.name}. ¡Atentos a lo que viene! #${campaignData.topic.replace(/\s/g, '')} #Innovation`,
+        platform: 'twitter',
+        status: 'draft',
+        predictedEngagement: 75
+      },
+      {
+        id: `camp-${Date.now()}-2`,
+        content: `Estamos emocionados de anunciar ${campaignData.topic}. Un paso más hacia el futuro.\n\n¿Qué opinan? 👇`,
+        platform: 'linkedin',
+        status: 'draft',
+        predictedEngagement: 88
+      },
+      {
+        id: `camp-${Date.now()}-3`,
+        content: `✨ ${campaignData.name} está aquí.\n.\nDescubre más en el link de la bio.\n.\n#${campaignData.topic.replace(/\s/g, '')} #New`,
+        platform: 'instagram',
+        status: 'draft',
+        predictedEngagement: 82
+      }
+    ] as SocialPost[];
+
+    // Filter based on selected platforms
+    const filteredPosts = newPosts.filter(p => campaignData.platforms.includes(p.platform) || p.platform === 'instagram');
+
+    setPosts(prev => [...prev, ...filteredPosts]);
+    setViewMode('calendar'); // Switch to calendar to see drafts
+  };
+
   return (
-    <div className="w-full min-h-screen bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto">
+    <div className="w-full h-full bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto relative">
 
       {/* Header */}
       <div className="flex justify-between items-center h-16 border-b border-white/5 pb-4">
@@ -1184,13 +1240,82 @@ const ContentSocialStudio: React.FC = () => {
             </button>
           </div>
 
-          <ObsidianButton variant="primary" className="text-xs px-6">
+          <ObsidianButton variant="primary" className="text-xs px-6" onClick={() => setIsCampaignModalOpen(true)}>
             <Plus size={14} className="mr-2" /> NUEVA CAMPAÑA
           </ObsidianButton>
         </div>
       </div>
 
       {viewMode === 'calendar' ? renderCalendar() : viewMode === 'list' ? renderListView() : viewMode === 'inbox' ? renderInboxView() : renderStudio()}
+
+      {/* CAMPAIGN MODAL */}
+      {isCampaignModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-[#0F0F12] border border-white/10 rounded-2xl shadow-2xl p-6">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <h2 className="text-lg font-light text-white tracking-wide flex items-center gap-2">
+                <Sparkles size={18} className="text-obsidian-accent" />
+                Nueva Campaña IA
+              </h2>
+              <button onClick={() => setIsCampaignModalOpen(false)}><X size={20} className="text-obsidian-text-muted hover:text-white" /></button>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <ObsidianInput
+                label="Nombre de la Campaña"
+                placeholder="Ej. Lanzamiento Verano 2025"
+                value={campaignData.name}
+                onChange={(e) => setCampaignData({ ...campaignData, name: e.target.value })}
+              />
+              <ObsidianInput
+                label="Tema Principal / Key Message"
+                placeholder="Ej. Descuentos exclusivos por tiempo limitado en toda la tienda..."
+                value={campaignData.topic}
+                onChange={(e) => setCampaignData({ ...campaignData, topic: e.target.value })}
+              />
+
+              <div>
+                <label className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-2 block">Canales Objetivo</label>
+                <div className="flex gap-2">
+                  {['twitter', 'linkedin', 'instagram'].map(p => (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        const newPlatforms = campaignData.platforms.includes(p as Platform)
+                          ? campaignData.platforms.filter(plat => plat !== p)
+                          : [...campaignData.platforms, p as Platform];
+                        setCampaignData({ ...campaignData, platforms: newPlatforms });
+                      }}
+                      className={`px-3 py-2 rounded text-xs capitalize transition-all border ${campaignData.platforms.includes(p as Platform)
+                        ? getPlatformColor(p as Platform)
+                        : 'bg-white/5 border-white/10 text-obsidian-text-muted hover:bg-white/10'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {getPlatformIcon(p as Platform, 12)} {p}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsCampaignModalOpen(false)}
+                className="px-4 py-2 text-xs text-obsidian-text-muted hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <ObsidianButton onClick={handleCreateCampaign} disabled={!campaignData.name || !campaignData.topic} glow>
+                <Zap size={14} className="mr-2" />
+                Generar Borradores
+              </ObsidianButton>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

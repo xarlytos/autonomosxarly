@@ -283,7 +283,7 @@ const NegotiationHub: React.FC = () => {
   // Vista de Tabla
   if (viewMode === 'table') {
     return (
-      <div className="w-full min-h-screen bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto">
+      <div className="w-full h-full bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center border-b border-white/5 pb-4">
           <div>
@@ -461,7 +461,7 @@ const NegotiationHub: React.FC = () => {
 
   // Vista de Detalle
   return (
-    <div className="w-full min-h-screen bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto relative">
+    <div className="w-full h-full bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col gap-6 overflow-y-auto relative">
       {/* Header */}
       <div className="flex justify-between items-center border-b border-white/5 pb-4">
         <div className="flex items-center gap-4">
@@ -903,7 +903,12 @@ const NegotiationHub: React.FC = () => {
                   {selectedNegotiation.offers.map((offer, index) => {
                     const isUs = offer.from === 'US';
                     const prevOffer = index > 0 ? selectedNegotiation.offers![index - 1] : null;
-                    const priceDiff = prevOffer ? offer.amount - prevOffer.amount : 0;
+                    const hasAmount = typeof offer.amount === 'number';
+                    const hasPrevAmount = prevOffer && typeof prevOffer.amount === 'number';
+
+                    const priceDiff = (hasAmount && hasPrevAmount)
+                      ? (offer.amount! - prevOffer!.amount!)
+                      : 0;
 
                     return (
                       <div key={offer.id} className={`p-4 rounded border ${isUs ? 'bg-green-500/5 border-green-500/20 ml-12' : 'bg-blue-500/5 border-blue-500/20 mr-12'}`}>
@@ -920,7 +925,9 @@ const NegotiationHub: React.FC = () => {
                         </div>
 
                         <div className="flex items-baseline gap-3 mb-2">
-                          <span className="text-2xl font-light text-white">${offer.amount.toLocaleString()}</span>
+                          {hasAmount && (
+                            <span className="text-2xl font-light text-white">${offer.amount!.toLocaleString()}</span>
+                          )}
                           {priceDiff !== 0 && (
                             <span className={`text-xs flex items-center gap-1 ${priceDiff > 0 ? 'text-red-400' : 'text-green-400'}`}>
                               {priceDiff > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}

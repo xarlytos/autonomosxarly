@@ -160,7 +160,7 @@ interface KeyMoment {
 interface NextStep {
   action: string;
   deadline: Date;
-  priority: 'low' | 'medium' | 'high';
+  priority: 'low' | 'medium' | 'high' | 'critical';
   assignedTo: string;
   automated: boolean;
 }
@@ -171,6 +171,16 @@ interface CRMUpdate {
   newValue: string;
   reason: string;
 }
+
+const STAGE_LABELS: Record<LeadStage, string> = {
+  NEW: 'Nuevo',
+  CONTACTED: 'Contactado',
+  QUALIFIED: 'Cualificado',
+  PROPOSAL: 'Propuesta',
+  CLOSING: 'Cierre',
+  WON: 'Ganado',
+  LOST: 'Perdido'
+};
 
 // ==================== SAMPLE DATA ====================
 
@@ -1196,6 +1206,49 @@ const BionicSales: React.FC = () => {
     setViewMode('summary');
   };
 
+  // Lead Creation logic
+  const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
+  const [newLeadData, setNewLeadData] = useState({ name: '', company: '', email: '' });
+
+  const handleNewLead = () => {
+    setIsNewLeadModalOpen(true);
+  };
+
+  const submitNewLead = () => {
+    if (!newLeadData.name) return;
+
+    const newLead: Lead = {
+      id: `L-${Date.now()}`,
+      name: newLeadData.name,
+      company: newLeadData.company || 'Nueva Empresa',
+      title: 'Contact',
+      email: newLeadData.email,
+      phone: '',
+      stage: 'NEW',
+      dealValue: 0,
+      probability: 10,
+      lastContact: new Date(),
+      notes: '',
+      source: 'Direct',
+      assignedTo: 'Me',
+      tags: [],
+      industry: 'Unknown',
+      companySize: 'Unknown',
+      location: 'Unknown',
+      competitors: [],
+      painPoints: [],
+      budget: { min: 0, max: 0 },
+      decisionMakers: [],
+      timeline: '',
+      history: [],
+      insights: []
+    };
+
+    setLeads(prev => [newLead, ...prev]);
+    setIsNewLeadModalOpen(false);
+    setNewLeadData({ name: '', company: '', email: '' });
+  };
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -1273,71 +1326,74 @@ const BionicSales: React.FC = () => {
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 pr-1">
                   {leadsByStage[stage].map(lead => (
-                    <ObsidianCard
+                    <div
                       key={lead.id}
-                      className="cursor-pointer hover:border-obsidian-accent/50 transition-all group"
+                      className="cursor-pointer"
                       onClick={() => startCall(lead)}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <p className="text-sm text-white font-medium mb-0.5">{lead.name}</p>
-                          <p className="text-xs text-obsidian-text-muted">{lead.company}</p>
-                          <p className="text-[10px] text-obsidian-text-muted mt-0.5">{lead.industry}</p>
-                        </div>
-                        <div className="flex flex-col gap-1 items-end">
-                          {lead.tags.includes('VIP') && (
-                            <span className="px-1.5 py-0.5 bg-obsidian-accent/20 text-obsidian-accent text-[9px] rounded">VIP</span>
-                          )}
-                          {lead.tags.includes('Hot Lead') && (
-                            <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 text-[9px] rounded">HOT</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Deal Value & Probability */}
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-                        <span className="text-xs text-white font-mono">${(lead.dealValue / 1000).toFixed(0)}K</span>
-                        <div className="flex items-center gap-1">
-                          <BarChart3 size={10} className="text-obsidian-accent" />
-                          <span className="text-xs text-obsidian-accent">{lead.probability}%</span>
-                        </div>
-                      </div>
-
-                      {/* Insights Preview */}
-                      {lead.insights.length > 0 && (
-                        <div className="mt-2 pt-2 border-t border-white/5">
-                          <div className="flex items-center gap-1">
-                            <Sparkles size={10} className="text-yellow-500" />
-                            <span className="text-[10px] text-obsidian-text-muted">
-                              {lead.insights.length} AI insight{lead.insights.length > 1 ? 's' : ''}
-                            </span>
+                      <ObsidianCard className="hover:border-obsidian-accent/50 transition-all group">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <p className="text-sm text-white font-medium mb-0.5">{lead.name}</p>
+                            <p className="text-xs text-obsidian-text-muted">{lead.company}</p>
+                            <p className="text-[10px] text-obsidian-text-muted mt-0.5">{lead.industry}</p>
+                          </div>
+                          <div className="flex flex-col gap-1 items-end">
+                            {lead.tags.includes('VIP') && (
+                              <span className="px-1.5 py-0.5 bg-obsidian-accent/20 text-obsidian-accent text-[9px] rounded">VIP</span>
+                            )}
+                            {lead.tags.includes('Hot Lead') && (
+                              <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 text-[9px] rounded">HOT</span>
+                            )}
                           </div>
                         </div>
-                      )}
 
-                      {/* Actions */}
-                      <div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            startCall(lead);
-                          }}
-                          className="flex-1 py-1.5 bg-green-500/10 border border-green-500/30 rounded text-xs text-green-500 hover:bg-green-500/20 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Phone size={10} />
-                          Llamar
-                        </button>
-                        <button className="flex-1 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
-                          <Mail size={10} />
-                          Correo
-                        </button>
-                      </div>
-                    </ObsidianCard>
+                        {/* Deal Value & Probability */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                          <span className="text-xs text-white font-mono">${(lead.dealValue / 1000).toFixed(0)}K</span>
+                          <div className="flex items-center gap-1">
+                            <BarChart3 size={10} className="text-obsidian-accent" />
+                            <span className="text-xs text-obsidian-accent">{lead.probability}%</span>
+                          </div>
+                        </div>
+
+                        {/* Insights Preview */}
+                        {lead.insights.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-white/5">
+                            <div className="flex items-center gap-1">
+                              <Sparkles size={10} className="text-yellow-500" />
+                              <span className="text-[10px] text-obsidian-text-muted">
+                                {lead.insights.length} AI insight{lead.insights.length > 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startCall(lead);
+                            }}
+                            className="flex-1 py-1.5 bg-green-500/10 border border-green-500/30 rounded text-xs text-green-500 hover:bg-green-500/20 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <Phone size={10} />
+                            Llamar
+                          </button>
+                          <button className="flex-1 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
+                            <Mail size={10} />
+                            Correo
+                          </button>
+                        </div>
+                      </ObsidianCard>
+                    </div>
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
+            ))
+            }
+          </div >
         ) : (
           /* List View */
           <ObsidianCard className="flex-1 overflow-hidden">
@@ -1372,7 +1428,7 @@ const BionicSales: React.FC = () => {
                       </td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 bg-obsidian-accent/20 text-obsidian-accent text-xs rounded">
-                          {lead.stage}
+                          {STAGE_LABELS[lead.stage]}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-white font-mono">${(lead.dealValue / 1000).toFixed(0)}K</td>
@@ -1407,7 +1463,7 @@ const BionicSales: React.FC = () => {
             </div>
           </ObsidianCard>
         )}
-      </div>
+      </div >
     );
   };
 
@@ -1778,7 +1834,7 @@ const BionicSales: React.FC = () => {
               <BrainCircuit size={18} className="text-obsidian-accent" />
               <div className="flex-1">
                 <h3 className="text-sm text-white font-medium">Asistente IA de Ventas</h3>
-                <p className="text-[10px] text-obsidian-text-muted">Real-time sales intelligence</p>
+                <p className="text-[10px] text-obsidian-text-muted">Inteligencia de ventas en tiempo real</p>
               </div>
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             </div>
@@ -1828,7 +1884,7 @@ const BionicSales: React.FC = () => {
                       {latestSuggestion.action}
                     </ObsidianButton>
                   )}
-                  {latestSuggestion.alternatives && latestSuggestion.alternatives.length > 0 && (
+                  {(latestSuggestion.type === 'warning' || latestSuggestion.priority === 'critical') && (
                     <div>
                       <p className="text-[10px] text-obsidian-text-muted uppercase tracking-wider mb-1">Alternatives</p>
                       <div className="space-y-1">
@@ -2227,7 +2283,7 @@ const BionicSales: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-light text-white mb-1">Ventas</h1>
-            <p className="text-sm text-obsidian-text-muted">AI-Powered Real-Time Sales Copilot</p>
+            <p className="text-sm text-obsidian-text-muted">Asistente de Ventas con IA</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex gap-1 bg-[#16161A] border border-white/10 rounded p-1">
@@ -2252,9 +2308,9 @@ const BionicSales: React.FC = () => {
               <Activity size={14} className="text-green-500" />
               <span className="text-xs text-white">All systems operational</span>
             </div>
-            <ObsidianButton size="sm">
+            <ObsidianButton size="sm" onClick={handleNewLead}>
               <Plus size={14} />
-              New Lead
+              Nuevo Lead
             </ObsidianButton>
           </div>
         </div>
@@ -2266,6 +2322,55 @@ const BionicSales: React.FC = () => {
         {viewMode === 'call' && renderCall()}
         {viewMode === 'summary' && renderSummary()}
       </div>
+      {/* New Lead Modal */}
+      {isNewLeadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-[#0F0F12] border border-white/10 rounded-2xl shadow-2xl p-6">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <h2 className="text-lg font-light text-white tracking-wide flex items-center gap-2">
+                <UserPlus size={18} className="text-obsidian-accent" />
+                Nuevo Lead
+              </h2>
+              <button onClick={() => setIsNewLeadModalOpen(false)}>
+                <X size={20} className="text-obsidian-text-muted hover:text-white" />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <ObsidianInput
+                label="Nombre Completo *"
+                placeholder="Ej. Juan Pérez"
+                value={newLeadData.name}
+                onChange={(e) => setNewLeadData({ ...newLeadData, name: e.target.value })}
+              />
+              <ObsidianInput
+                label="Empresa"
+                placeholder="Ej. Tech Solutions"
+                value={newLeadData.company}
+                onChange={(e) => setNewLeadData({ ...newLeadData, company: e.target.value })}
+              />
+              <ObsidianInput
+                label="Email"
+                placeholder="juan@ejemplo.com"
+                value={newLeadData.email}
+                onChange={(e) => setNewLeadData({ ...newLeadData, email: e.target.value })}
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsNewLeadModalOpen(false)}
+                className="px-4 py-2 rounded text-xs text-obsidian-text-muted hover:text-white hover:bg-white/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <ObsidianButton variant="primary" onClick={submitNewLead} disabled={!newLeadData.name}>
+                Crear Lead
+              </ObsidianButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

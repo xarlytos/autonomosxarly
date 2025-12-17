@@ -62,6 +62,18 @@ interface FinancialMetrics {
 }
 
 // ==================== SAMPLE DATA ====================
+const VIEW_MODE_LABELS: Record<ViewMode, string> = {
+  dashboard: 'Resumen',
+  ledger: 'Libro Mayor',
+  invoices: 'Facturas',
+  reports: 'Informes',
+  escrow: 'Fideicomiso & SSI',
+  payments: 'Pagos',
+  transactions: 'Movimientos',
+  tax: 'Impuestos',
+  connect: 'Conexiones',
+  contacts: 'Contactos'
+};
 
 const SAMPLE_TRANSACTIONS: Transaction[] = [
   { id: 'TX-8842', concept: 'AWS Infrastructure', amount: 430.00, currency: 'USD', type: 'OUT', status: 'VERIFIED', date: new Date(Date.now() - 2 * 3600000), category: 'Software Expense', taxRule: 'Rule 179-B', account: 'Business Checking', confidence: 98.2, aiAnalysis: { category: 'Cloud Services', confidence: 98.2, taxDeductible: true, flags: [] } },
@@ -686,24 +698,27 @@ const NeuroFinance: React.FC = () => {
       <div className="grid grid-cols-4 gap-4">
         <ObsidianCard>
           <p className="text-xs text-obsidian-text-muted mb-2">Total Pendiente</p>
-          <p className="text-2xl font-light text-white">
+          <div className="text-3xl font-thin text-white mb-1">
             ${invoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.amount, 0).toLocaleString()}
-          </p>
+          </div>
+          <p className="text-xs text-obsidian-text-muted uppercase tracking-wider">Total Pendiente</p>
         </ObsidianCard>
-        <ObsidianCard>
-          <p className="text-xs text-obsidian-text-muted mb-2">Enviadas</p>
-          <p className="text-2xl font-light text-blue-500">{invoices.filter(i => i.status === 'SENT').length}</p>
-        </ObsidianCard>
-        <ObsidianCard>
-          <p className="text-xs text-obsidian-text-muted mb-2">Vencidas</p>
-          <p className="text-2xl font-light text-red-500">{invoices.filter(i => i.status === 'OVERDUE').length}</p>
-        </ObsidianCard>
-        <ObsidianCard>
-          <p className="text-xs text-obsidian-text-muted mb-2">Pagadas este mes</p>
-          <p className="text-2xl font-light text-green-500">{invoices.filter(i => i.status === 'PAID').length}</p>
-        </ObsidianCard>
-      </div>
 
+        <div className="bg-[#16161A] rounded p-4 border border-white/5 text-center">
+          <p className="text-2xl font-light text-blue-500">{invoices.filter(i => i.status === 'SENT').length}</p>
+          <p className="text-xs text-obsidian-text-muted mt-1">Enviadas</p>
+        </div>
+
+        <div className="bg-[#16161A] rounded p-4 border border-white/5 text-center">
+          <p className="text-2xl font-light text-red-500">{invoices.filter(i => i.status === 'OVERDUE').length}</p>
+          <p className="text-xs text-obsidian-text-muted mt-1">Vencidas</p>
+        </div>
+
+        <div className="bg-[#16161A] rounded p-4 border border-white/5 text-center">
+          <p className="text-2xl font-light text-green-500">{invoices.filter(i => i.status === 'PAID').length}</p>
+          <p className="text-xs text-obsidian-text-muted mt-1">Pagadas</p>
+        </div>
+      </div>
       {/* Invoice List */}
       <ObsidianCard className="flex-1 overflow-hidden flex flex-col">
         <div className="overflow-y-auto flex-1">
@@ -1098,7 +1113,7 @@ const NeuroFinance: React.FC = () => {
               {mode === 'invoices' && <FileText size={14} className="inline mr-2" />}
               {mode === 'reports' && <BarChart3 size={14} className="inline mr-2" />}
               {mode === 'escrow' && <Lock size={14} className="inline mr-2" />}
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+              {VIEW_MODE_LABELS[mode]}
             </button>
           ))}
         </div>
