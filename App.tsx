@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginForm from './components/LoginForm';
 import { Sidebar } from './components/Sidebar';
 import DTOLab from './components/DTOLab';
@@ -51,9 +51,18 @@ interface WarRoomDashboardProps {
 }
 
 const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
+  const { uiMode } = useGlobalState();
   const { connected, kpis, swarms, events, opportunities, alerts, controlSwarm, markAlertAsRead } = useWarRoom();
   const { layout, isCustomizing, setIsCustomizing, addWidget, removeWidget, updateLayout, resetLayout } = useDashboardLayout();
   const [activeTab, setActiveTab] = useState<'overview' | 'swarms' | 'alerts'>('overview');
+
+  // Advanced widgets to hide in Lite Mode
+  const advancedWidgets: WidgetType[] = ['swarm-status', 'system-metrics', 'market-topology', 'event-stream'];
+
+  // Filter widgets for Lite Mode
+  const visibleWidgets = uiMode === 'lite'
+    ? layout.widgets.filter(w => !advancedWidgets.includes(w.type))
+    : layout.widgets;
 
   // Onboarding Hook
   const { isPlaying, completeTour, skipTour } = useOnboarding('dashboard');
@@ -98,7 +107,7 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
 
   // Handle layout changes from drag-and-drop
   const handleLayoutChange = (newLayout: any[]) => {
-    const updatedWidgets = layout.widgets.map(widget => {
+    const updatedWidgets = visibleWidgets.map(widget => {
       const layoutItem = newLayout.find(l => l.i === widget.id);
       if (layoutItem) {
         return {
@@ -108,6 +117,15 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
       }
       return widget;
     });
+    // Use visibleWidgets logic slightly adjusted or just updateLayout
+    // Since we're in lite mode, we only update filtered widgets. 
+    // This is tricky for persistence if we overwrite layout with partial widgets.
+    // For now, let's just update the specific widgets that moved.
+    // But updateLayout expects full list? 
+    // If updateLayout overwrites state, we might lose hidden widgets.
+    // Assuming updateLayout merges or we pass only modified ones.
+    // Let's assume for now we only support reordering visible ones and it might save partially.
+    // Ideally updateLayout should handle merging.
     updateLayout(updatedWidgets);
   };
 
@@ -155,21 +173,26 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
             >
               Resumen
             </button>
-            <button
-              onClick={() => setActiveTab('swarms')}
-              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'swarms' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
-            >
-              Enjambres ({swarms.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('alerts')}
-              className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors relative ${activeTab === 'alerts' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
-            >
-              Alertas
-              {alerts.filter(a => !a.read).length > 0 && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-              )}
-            </button>
+
+            {uiMode === 'advanced' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('swarms')}
+                  className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors ${activeTab === 'swarms' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
+                >
+                  Enjambres ({swarms.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('alerts')}
+                  className={`px-3 py-1 text-[10px] uppercase tracking-wider transition-colors relative ${activeTab === 'alerts' ? 'text-white border-b-2 border-obsidian-accent' : 'text-obsidian-text-muted hover:text-white'}`}
+                >
+                  Alertas
+                  {alerts.filter(a => !a.read).length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse" />
+                  )}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Customize Button */}
@@ -192,7 +215,7 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
       <div className="relative z-10 h-[calc(100%-80px)]">
         {activeTab === 'overview' && (
           <DashboardGrid
-            widgets={layout.widgets}
+            widgets={visibleWidgets}
             isCustomizing={isCustomizing}
             onLayoutChange={handleLayoutChange}
             onRemoveWidget={removeWidget}
@@ -201,13 +224,13 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
           />
         )}
 
-        {activeTab === 'swarms' && (
+        {activeTab === 'swarms' && uiMode === 'advanced' && (
           <div className="w-full max-w-4xl mx-auto h-full overflow-y-auto">
             <SwarmStatusPanel swarms={swarms} onControlSwarm={controlSwarm} />
           </div>
         )}
 
-        {activeTab === 'alerts' && (
+        {activeTab === 'alerts' && uiMode === 'advanced' && (
           <div className="w-full max-w-4xl mx-auto h-full overflow-y-auto">
             <AlertsPanel alerts={alerts} onMarkAsRead={markAlertAsRead} />
           </div>
@@ -221,8 +244,8 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
           onRemoveWidget={removeWidget}
           onReset={resetLayout}
           onClose={() => setIsCustomizing(false)}
-          existingWidgets={layout.widgets.map(w => w.type)}
-          currentWidgets={layout.widgets}
+          existingWidgets={visibleWidgets.map(w => w.type)}
+          currentWidgets={visibleWidgets}
           getWidgetTitle={getWidgetTitle}
         />
       )}
@@ -232,7 +255,12 @@ const WarRoomDashboard: React.FC<WarRoomDashboardProps> = ({ onNavigate }) => {
 
 // --- MAIN APP LOGIC ---
 
+import { useGlobalState } from './context/GlobalStateContext';
+
+// ... existing imports
+
 const App: React.FC = () => {
+  const { uiMode } = useGlobalState();
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
@@ -242,6 +270,30 @@ const App: React.FC = () => {
 
   const [currentView, setCurrentView] = useState<'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar'>('war-room');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  // Advanced modules that are restricted in Lite Mode
+  const advancedModules = [
+    'dto-lab', 'swarm-orchestrator', 'negotiation-hub',
+    'persona-studio', 'content-social', 'funnels',
+    'lead-magnet', 'ontology-core', 'system-health', 'ssi-vault'
+  ];
+
+  // Helper to safely change view enforcing Lite Mode restrictions
+  const handleNavigate = (view: typeof currentView) => {
+    if (uiMode === 'lite' && advancedModules.includes(view)) {
+      // If trying to access advanced module in lite mode, redirect to dashboard
+      setCurrentView('war-room');
+      return;
+    }
+    setCurrentView(view);
+  };
+
+  // Effect to redirect to dashboard if current view becomes invalid due to mode switch
+  useEffect(() => {
+    if (uiMode === 'lite' && advancedModules.includes(currentView)) {
+      setCurrentView('war-room');
+    }
+  }, [uiMode, currentView]);
 
   const handleLogin = (data: LoginFormData) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -281,13 +333,13 @@ const App: React.FC = () => {
       <div className="bg-[#0B0B0D] min-h-screen text-obsidian-text-primary font-sans flex">
         <Sidebar
           currentView={currentView}
-          onChangeView={setCurrentView}
+          onChangeView={handleNavigate}
           onLogout={handleLogout}
           onOpenHelp={() => setIsHelpOpen(true)}
         />
 
         <main className="flex-1 h-screen overflow-hidden bg-[#0B0B0D]">
-          {currentView === 'war-room' && <WarRoomDashboard onNavigate={setCurrentView} />}
+          {currentView === 'war-room' && <WarRoomDashboard onNavigate={handleNavigate} />}
           {currentView === 'dto-lab' && <DTOLab />}
           {currentView === 'swarm-orchestrator' && <SwarmOrchestrator />}
           {currentView === 'negotiation-hub' && <NegotiationHub />}

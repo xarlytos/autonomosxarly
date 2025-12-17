@@ -749,8 +749,8 @@ const SSIVault: React.FC = () => {
                     <th className="text-left p-3 text-[10px] text-obsidian-text-muted uppercase">Agent</th>
                     <th className="text-left p-3 text-[10px] text-obsidian-text-muted uppercase">Role</th>
                     <th className="text-center p-3 text-[10px] text-obsidian-text-muted uppercase">Reputation</th>
-                    <th className="text-center p-3 text-[10px] text-obsidian-text-muted uppercase">Status</th>
-                    <th className="text-center p-3 text-[10px] text-obsidian-text-muted uppercase">Actions</th>
+                    <th className="text-center p-3 text-[10px] text-obsidian-text-muted uppercase">Estado</th>
+                    <th className="text-center p-3 text-[10px] text-obsidian-text-muted uppercase">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1119,7 +1119,7 @@ const SSIVault: React.FC = () => {
               </ObsidianCard>
 
               <ObsidianCard>
-                <h4 className="text-sm text-white mb-3">Actions</h4>
+                <h4 className="text-sm text-white mb-3">Acciones</h4>
                 <div className="space-y-2">
                   <ObsidianButton className="w-full justify-start" variant="outline">
                     <RefreshCw size={14} />

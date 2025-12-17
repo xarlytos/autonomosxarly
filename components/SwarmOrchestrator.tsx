@@ -7,6 +7,9 @@ import {
   Settings, BarChart3, FileText, AlertTriangle, X, Edit2, Trash2,
   Info, HelpCircle, Zap, Target, Scale, Save, Download, Workflow
 } from 'lucide-react';
+import { InteractiveTour } from './Onboarding/InteractiveTour';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { AUTOMATION_TOUR_STEPS } from '../data/tourStepsAutomation';
 import WorkflowEditorWrapper from './AutomationEditor/WorkflowEditor';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -460,6 +463,7 @@ const SAMPLE_MISSIONS: Mission[] = [
 
 const SwarmOrchestrator: React.FC = () => {
   // --- State Management ---
+  const { isPlaying, completeTour, skipTour } = useOnboarding('swarm-orchestrator');
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
   const [missions, setMissions] = useState<Mission[]>(SAMPLE_MISSIONS);
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
@@ -1233,7 +1237,7 @@ const SwarmOrchestrator: React.FC = () => {
 
     // Title
     doc.setFontSize(20);
-    doc.text('Swarm Orchestrator', 14, 20);
+    doc.text('Mis Automatizaciones', 14, 20);
     doc.setFontSize(12);
     doc.text(`Reporte de Misión - ${mission.name}`, 14, 28);
 
@@ -1335,22 +1339,31 @@ const SwarmOrchestrator: React.FC = () => {
 
   // --- Render Functions ---
   const renderDashboard = () => (
-    <div className="w-full h-screen bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col overflow-hidden">
+    <div className="w-full h-screen bg-[#0B0B0D] text-obsidian-text-primary px-6 py-6 flex flex-col overflow-hidden relative">
+      <InteractiveTour
+        isOpen={isPlaying}
+        steps={AUTOMATION_TOUR_STEPS}
+        onComplete={completeTour}
+        onSkip={skipTour}
+      />
+
       {/* Header */}
       <div className="mb-6 animate-[fadeIn_0.5s_ease-out]">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-light text-[#F5F5F7] tracking-wide mb-1">Swarm Orchestrator</h1>
+          <div className="tour-swarm-header">
+            <h1 className="text-2xl font-light text-[#F5F5F7] tracking-wide mb-1">Mis Automatizaciones</h1>
             <p className="text-sm text-obsidian-text-muted">Centro de mando para gestión de enjambres de agentes</p>
           </div>
           <div className="flex gap-4 items-center">
-            <div className="text-right">
-              <div className="text-sm text-obsidian-text-muted">Agentes Activos</div>
-              <div className="text-2xl font-thin text-white">{totalAgents}</div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-obsidian-text-muted">Coste Acumulado</div>
-              <div className="text-2xl font-thin text-white">${totalCost.toFixed(2)}</div>
+            <div className="flex gap-4 tour-swarm-stats">
+              <div className="text-right">
+                <div className="text-sm text-obsidian-text-muted">Agentes Activos</div>
+                <div className="text-2xl font-thin text-white">{totalAgents}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-obsidian-text-muted">Coste Acumulado</div>
+                <div className="text-2xl font-thin text-white">${totalCost.toFixed(2)}</div>
+              </div>
             </div>
             <button
               onClick={() => setGlossaryOpen(true)}
@@ -1359,12 +1372,14 @@ const SwarmOrchestrator: React.FC = () => {
             >
               <HelpCircle size={20} className="text-obsidian-text-muted hover:text-white transition-colors" />
             </button>
-            <ObsidianButton onClick={() => setViewMode('create')}>
-              <div className="flex items-center gap-2">
-                <Plus size={16} />
-                <span>Nueva Misión</span>
-              </div>
-            </ObsidianButton>
+            <div className="tour-swarm-create-btn">
+              <ObsidianButton onClick={() => setViewMode('create')}>
+                <div className="flex items-center gap-2">
+                  <Plus size={16} />
+                  <span>Nueva Misión</span>
+                </div>
+              </ObsidianButton>
+            </div>
           </div>
         </div>
       </div>
@@ -1393,7 +1408,7 @@ const SwarmOrchestrator: React.FC = () => {
 
       {/* Active Missions Tab */}
       {dashboardTab === 'active' && (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto tour-swarm-list">
           <div className="grid grid-cols-1 gap-4 animate-[fadeIn_0.6s_ease-out_0.2s_both]">
             {missions.map(mission => (
               <ObsidianCard key={mission.id} className="hover:bg-white/[0.02] transition-all cursor-pointer group">
@@ -2684,7 +2699,7 @@ const SwarmOrchestrator: React.FC = () => {
 
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-white mb-1">Enjambre (Swarm)</h3>
+                <h3 className="text-sm font-medium text-white mb-1">Automatización</h3>
                 <p className="text-xs text-obsidian-text-muted leading-relaxed">
                   Conjunto coordinado de agentes autónomos que trabajan en paralelo para completar una misión compleja.
                   Cada enjambre tiene capacidades específicas según su tipo (Research, Sentiment, Negotiation, etc.).
@@ -2700,7 +2715,7 @@ const SwarmOrchestrator: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-white mb-1">HAAS (Hierarchical Autonomous Agent Swarms)</h3>
+                <h3 className="text-sm font-medium text-white mb-1">Sistema de Agentes Autónomos</h3>
                 <p className="text-xs text-obsidian-text-muted leading-relaxed">
                   Sistema de enjambres jerárquicos de agentes autónomos. Permite desplegar cientos de agentes especializados
                   que trabajan coordinadamente bajo una estructura organizativa jerárquica.

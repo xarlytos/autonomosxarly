@@ -307,13 +307,13 @@ const EmailHub: React.FC = () => {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-2xl font-bold text-white">85%</div>
-                                    <div className="text-[10px] text-obsidian-text-muted uppercase tracking-wider">Engagement</div>
+                                    <div className="text-[10px] text-obsidian-text-muted uppercase tracking-wider">Compromiso</div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                                    <div className="text-[10px] text-obsidian-text-muted mb-1">Pipeline Stage</div>
+                                    <div className="text-[10px] text-obsidian-text-muted mb-1">Etapa del Pipeline</div>
                                     <div className="text-sm font-medium text-white flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div> Negociación
                                     </div>
@@ -325,7 +325,7 @@ const EmailHub: React.FC = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <button className="w-full py-2 bg-obsidian-accent hover:bg-obsidian-accent/90 text-white rounded text-xs font-medium transition-colors">Ver Perfil Completo en Bionic Sales</button>
+                                <button className="w-full py-2 bg-obsidian-accent hover:bg-obsidian-accent/90 text-white rounded text-xs font-medium transition-colors">Ver Perfil Completo en Ventas</button>
                                 <button className="w-full py-2 bg-white/5 hover:bg-white/10 text-white rounded text-xs transition-colors border border-white/5">Agendar Reunión </button>
                             </div>
                         </div>
@@ -614,7 +614,7 @@ const EmailHub: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <div className="px-3 py-1 bg-obsidian-accent/10 border border-obsidian-accent/20 rounded-full flex items-center gap-2 cursor-pointer hover:bg-obsidian-accent/20 transition-colors">
                                     <Sparkles size={12} className="text-obsidian-accent" />
-                                    <span className="text-[10px] text-obsidian-accent font-medium uppercase tracking-wide">AI Summary Available</span>
+                                    <span className="text-[10px] text-obsidian-accent font-medium uppercase tracking-wide">Resumen IA Disponible</span>
                                 </div>
                             </div>
                         </div>

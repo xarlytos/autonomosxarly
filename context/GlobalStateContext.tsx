@@ -143,6 +143,9 @@ interface GlobalStateContextType {
     addCalendarEvent: (event: CalendarEvent) => void;
     updateCalendarEvent: (event: CalendarEvent) => void;
     deleteCalendarEvent: (eventId: string) => void;
+
+    uiMode: 'lite' | 'advanced';
+    setUIMode: (mode: 'lite' | 'advanced') => void;
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
@@ -153,6 +156,21 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics>(INITIAL_METRICS);
 
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+
+    // UI Mode State
+    const [uiMode, setUIModeState] = useState<'lite' | 'advanced'>(() => {
+        // Safe check for SSR/SSG environments
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('obsidian_ui_mode');
+            return (saved as 'lite' | 'advanced') || 'lite';
+        }
+        return 'lite';
+    });
+
+    const setUIMode = (mode: 'lite' | 'advanced') => {
+        setUIModeState(mode);
+        localStorage.setItem('obsidian_ui_mode', mode);
+    };
 
     // Load from LocalStorage on mount
     useEffect(() => {
@@ -241,7 +259,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         <GlobalStateContext.Provider value={{
             negotiations, updateNegotiation,
             transactions, financialMetrics, addTransaction, updateFinancialMetrics,
-            calendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent
+            calendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent,
+            uiMode, setUIMode
         }}>
             {children}
         </GlobalStateContext.Provider>

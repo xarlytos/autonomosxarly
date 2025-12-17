@@ -124,12 +124,12 @@ const SAMPLE_INCIDENTS: Incident[] = [
   },
   {
     id: 'inc-003',
-    title: 'High CPU Load - Swarm Node 4',
+    title: 'Alta Carga CPU - Nodo de Automatización 4',
     description: 'CPU utilization exceeded 85% on agent orchestration node',
     severity: 'MEDIUM',
     status: 'RESOLVED',
     timestamp: new Date(Date.now() - 900000),
-    affectedService: 'Agent Swarm',
+    affectedService: 'Sistema de Agentes',
     detectedBy: 'Infrastructure Monitor',
     actions: [
       { step: 1, action: 'CPU spike detected: 87.3%', timestamp: new Date(Date.now() - 900000), status: 'SUCCESS' },
@@ -223,7 +223,7 @@ const SAMPLE_SERVICES: ServiceComponent[] = [
   },
   {
     id: 'svc-005',
-    name: 'Agent Swarm Orchestrator',
+    name: 'Sistema de Automatizaciones',
     category: 'AGENT',
     status: 'OPERATIONAL',
     uptime: 99.87,
@@ -431,7 +431,7 @@ const SAMPLE_ALERTS: AlertRule[] = [
   },
   {
     id: 'alert-005',
-    name: 'Agent Swarm Failure',
+    name: 'Fallo del Sistema de Agentes',
     condition: 'Agent mission success rate < 80%',
     threshold: 'for 30 minutes',
     channels: ['EMAIL', 'SLACK'],
@@ -752,9 +752,9 @@ const SystemHealth: React.FC = () => {
                         </span>
                       </div>
                       <span className={`text-[9px] px-2 py-0.5 rounded ${incident.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-500' :
-                          incident.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
-                            incident.severity === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                              'bg-blue-500/20 text-blue-500'
+                        incident.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
+                          incident.severity === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
+                            'bg-blue-500/20 text-blue-500'
                         }`}>
                         {incident.severity}
                       </span>
@@ -788,8 +788,8 @@ const SystemHealth: React.FC = () => {
                     <div key={service.id} className="flex items-center justify-between p-2 bg-white/5 rounded">
                       <div className="flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${service.status === 'OPERATIONAL' ? 'bg-green-500' :
-                            service.status === 'DEGRADED' ? 'bg-yellow-500 animate-pulse' :
-                              'bg-red-500 animate-pulse'
+                          service.status === 'DEGRADED' ? 'bg-yellow-500 animate-pulse' :
+                            'bg-red-500 animate-pulse'
                           }`}></div>
                         <div>
                           <p className="text-xs text-white">{service.name}</p>
@@ -834,8 +834,8 @@ const SystemHealth: React.FC = () => {
                 <div
                   key={incident.id}
                   className={`p-4 rounded border cursor-pointer transition-colors ${selectedIncidentId === incident.id
-                      ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   onClick={() => setSelectedIncidentId(incident.id)}
                 >
@@ -848,9 +848,9 @@ const SystemHealth: React.FC = () => {
                       <span className="text-sm text-white font-medium">{incident.title}</span>
                     </div>
                     <span className={`text-[9px] px-2 py-0.5 rounded font-semibold ${incident.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-500' :
-                        incident.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
-                          incident.severity === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                            'bg-blue-500/20 text-blue-500'
+                      incident.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-500' :
+                        incident.severity === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
+                          'bg-blue-500/20 text-blue-500'
                       }`}>
                       {incident.severity}
                     </span>
@@ -869,8 +869,8 @@ const SystemHealth: React.FC = () => {
                       </span>
                     </div>
                     <span className={`font-semibold uppercase ${incident.status === 'RESOLVED' ? 'text-green-500' :
-                        incident.status === 'HEALING' ? 'text-yellow-500' :
-                          'text-red-500'
+                      incident.status === 'HEALING' ? 'text-yellow-500' :
+                        'text-red-500'
                       }`}>
                       {incident.status}
                     </span>
@@ -898,8 +898,8 @@ const SystemHealth: React.FC = () => {
                     <p className="text-sm text-obsidian-text-muted mt-1">{selectedIncident.description}</p>
                   </div>
                   <span className={`px-3 py-1 rounded text-xs font-semibold ${selectedIncident.status === 'RESOLVED' ? 'bg-green-500/20 text-green-500' :
-                      selectedIncident.status === 'HEALING' ? 'bg-yellow-500/20 text-yellow-500' :
-                        'bg-red-500/20 text-red-500'
+                    selectedIncident.status === 'HEALING' ? 'bg-yellow-500/20 text-yellow-500' :
+                      'bg-red-500/20 text-red-500'
                     }`}>
                     {selectedIncident.status}
                   </span>
@@ -935,8 +935,8 @@ const SystemHealth: React.FC = () => {
                     <div key={index} className="flex gap-3">
                       <div className="flex flex-col items-center">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${action.status === 'SUCCESS' ? 'bg-green-500/20 text-green-500' :
-                            action.status === 'FAILED' ? 'bg-red-500/20 text-red-500' :
-                              'bg-yellow-500/20 text-yellow-500'
+                          action.status === 'FAILED' ? 'bg-red-500/20 text-red-500' :
+                            'bg-yellow-500/20 text-yellow-500'
                           }`}>
                           {action.step}
                         </div>
@@ -1014,17 +1014,17 @@ const SystemHealth: React.FC = () => {
                     <div
                       key={service.id}
                       className={`p-3 rounded border cursor-pointer transition-colors ${selectedServiceId === service.id
-                          ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
-                          : 'bg-white/5 border-white/10 hover:bg-white/10'
+                        ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10'
                         }`}
                       onClick={() => setSelectedServiceId(service.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${service.status === 'OPERATIONAL' ? 'bg-green-500' :
-                              service.status === 'DEGRADED' ? 'bg-yellow-500 animate-pulse' :
-                                service.status === 'DOWN' ? 'bg-red-500 animate-pulse' :
-                                  'bg-blue-500'
+                            service.status === 'DEGRADED' ? 'bg-yellow-500 animate-pulse' :
+                              service.status === 'DOWN' ? 'bg-red-500 animate-pulse' :
+                                'bg-blue-500'
                             }`}></div>
                           <span className="text-xs text-white">{service.name}</span>
                         </div>
@@ -1052,9 +1052,9 @@ const SystemHealth: React.FC = () => {
                     <p className="text-sm text-obsidian-text-muted mt-1">{selectedService.category}</p>
                   </div>
                   <span className={`px-3 py-1 rounded text-xs font-semibold ${selectedService.status === 'OPERATIONAL' ? 'bg-green-500/20 text-green-500' :
-                      selectedService.status === 'DEGRADED' ? 'bg-yellow-500/20 text-yellow-500' :
-                        selectedService.status === 'DOWN' ? 'bg-red-500/20 text-red-500' :
-                          'bg-blue-500/20 text-blue-500'
+                    selectedService.status === 'DEGRADED' ? 'bg-yellow-500/20 text-yellow-500' :
+                      selectedService.status === 'DOWN' ? 'bg-red-500/20 text-red-500' :
+                        'bg-blue-500/20 text-blue-500'
                     }`}>
                     {selectedService.status}
                   </span>
@@ -1076,8 +1076,8 @@ const SystemHealth: React.FC = () => {
                   <div className="p-3 bg-white/5 rounded">
                     <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Latency</p>
                     <p className={`text-2xl font-light ${selectedService.latency > 500 ? 'text-red-500' :
-                        selectedService.latency > 200 ? 'text-yellow-500' :
-                          'text-green-500'
+                      selectedService.latency > 200 ? 'text-yellow-500' :
+                        'text-green-500'
                       }`}>
                       {selectedService.latency}ms
                     </p>
@@ -1093,7 +1093,7 @@ const SystemHealth: React.FC = () => {
                   </div>
 
                   <div className="p-3 bg-white/5 rounded">
-                    <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Status</p>
+                    <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Estado</p>
                     <p className="text-sm text-white">{selectedService.status}</p>
                   </div>
                 </div>
@@ -1111,8 +1111,8 @@ const SystemHealth: React.FC = () => {
                       <div className="w-full h-2 bg-white/10 rounded overflow-hidden">
                         <div
                           className={`h-full ${selectedService.metrics.cpu > 80 ? 'bg-red-500' :
-                              selectedService.metrics.cpu > 60 ? 'bg-yellow-500' :
-                                'bg-green-500'
+                            selectedService.metrics.cpu > 60 ? 'bg-yellow-500' :
+                              'bg-green-500'
                             }`}
                           style={{ width: `${selectedService.metrics.cpu}%` }}
                         ></div>
@@ -1129,8 +1129,8 @@ const SystemHealth: React.FC = () => {
                       <div className="w-full h-2 bg-white/10 rounded overflow-hidden">
                         <div
                           className={`h-full ${selectedService.metrics.memory > 80 ? 'bg-red-500' :
-                              selectedService.metrics.memory > 60 ? 'bg-yellow-500' :
-                                'bg-green-500'
+                            selectedService.metrics.memory > 60 ? 'bg-yellow-500' :
+                              'bg-green-500'
                             }`}
                           style={{ width: `${selectedService.metrics.memory}%` }}
                         ></div>
@@ -1149,8 +1149,8 @@ const SystemHealth: React.FC = () => {
                     <div className="flex justify-between p-2 bg-white/5 rounded">
                       <span className="text-xs text-obsidian-text-muted">Error Count</span>
                       <span className={`text-xs font-mono ${selectedService.metrics.errors > 10 ? 'text-red-500' :
-                          selectedService.metrics.errors > 5 ? 'text-yellow-500' :
-                            'text-green-500'
+                        selectedService.metrics.errors > 5 ? 'text-yellow-500' :
+                          'text-green-500'
                         }`}>
                         {selectedService.metrics.errors}
                       </span>
@@ -1160,7 +1160,7 @@ const SystemHealth: React.FC = () => {
               </ObsidianCard>
 
               <ObsidianCard className="flex-1">
-                <h4 className="text-sm text-white mb-4">Actions</h4>
+                <h4 className="text-sm text-white mb-4">Acciones</h4>
                 <div className="space-y-2">
                   <ObsidianButton className="w-full justify-start" variant="outline">
                     <Eye size={14} />
@@ -1214,8 +1214,8 @@ const SystemHealth: React.FC = () => {
                 <div
                   key={playbook.id}
                   className={`p-4 rounded border cursor-pointer transition-colors ${selectedPlaybookId === playbook.id
-                      ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    ? 'bg-obsidian-accent/10 border-obsidian-accent/30'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   onClick={() => setSelectedPlaybookId(playbook.id)}
                 >
@@ -1229,8 +1229,8 @@ const SystemHealth: React.FC = () => {
                       <span className="text-sm text-white font-medium">{playbook.name}</span>
                     </div>
                     <span className={`text-[9px] px-2 py-0.5 rounded font-semibold ${playbook.status === 'ENABLED' ? 'bg-green-500/20 text-green-500' :
-                        playbook.status === 'TESTING' ? 'bg-yellow-500/20 text-yellow-500' :
-                          'bg-red-500/20 text-red-500'
+                      playbook.status === 'TESTING' ? 'bg-yellow-500/20 text-yellow-500' :
+                        'bg-red-500/20 text-red-500'
                       }`}>
                       {playbook.status}
                     </span>
@@ -1264,8 +1264,8 @@ const SystemHealth: React.FC = () => {
                   </div>
                   <button
                     className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${selectedPlaybook.status === 'ENABLED'
-                        ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30'
-                        : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'
+                      ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30'
+                      : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'
                       }`}
                   >
                     {selectedPlaybook.status === 'ENABLED' ? 'Disable' : 'Enable'}
@@ -1319,7 +1319,7 @@ const SystemHealth: React.FC = () => {
               </ObsidianCard>
 
               <ObsidianCard>
-                <h4 className="text-sm text-white mb-3">Actions</h4>
+                <h4 className="text-sm text-white mb-3">Acciones</h4>
                 <div className="space-y-2">
                   <ObsidianButton className="w-full justify-start" variant="outline">
                     <Play size={14} />
@@ -1416,8 +1416,8 @@ const SystemHealth: React.FC = () => {
                     </div>
                     <button
                       className={`text-[9px] px-2 py-0.5 rounded font-semibold transition-colors ${alert.enabled
-                          ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30'
-                          : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'
+                        ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30'
+                        : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'
                         }`}
                     >
                       {alert.enabled ? 'ENABLED' : 'DISABLED'}
@@ -1588,8 +1588,8 @@ const SystemHealth: React.FC = () => {
             key={mode}
             onClick={() => setViewMode(mode)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${viewMode === mode
-                ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(69,255,154,0.3)]'
-                : 'bg-white/5 text-obsidian-text-muted hover:bg-white/10 hover:text-white'
+              ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(69,255,154,0.3)]'
+              : 'bg-white/5 text-obsidian-text-muted hover:bg-white/10 hover:text-white'
               }`}
           >
             <Icon size={14} />

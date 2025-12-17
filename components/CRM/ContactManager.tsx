@@ -35,7 +35,7 @@ const MOCK_CONTACTS: Contact[] = [
         direction: 'INBOUND',
         date: '2025-05-15T10:30:00',
         subject: 'Llamada de seguimiento completada',
-        details: 'Discutimos los detalles del contrato Q3. Interés alto en módulo de Swarms.',
+        details: 'Discutimos los detalles del contrato Q3. Interés alto en módulo de Automatizaciones.',
         status: 'COMPLETED'
       },
       {
@@ -124,7 +124,7 @@ const MOCK_CONTACTS: Contact[] = [
     lastContact: '2025-04-20',
     tags: ['Security', 'Competitor'],
     location: 'Tel Aviv, IL',
-    notes: 'Launched a new feature similar to our Swarm Orchestrator.',
+    notes: 'Lanzó una funcionalidad similar a nuestro Sistema de Automatizaciones.',
     social: { website: 'cyberguard.net' },
     history: []
   },
@@ -564,7 +564,7 @@ export const ContactManager: React.FC = () => {
                       </span>
                     ))}
                     <button className="px-2.5 py-1 border border-dashed border-white/10 rounded-md text-[10px] text-obsidian-text-muted hover:text-white hover:border-white/30 transition-colors">
-                      + Add
+                      + Añadir
                     </button>
                   </div>
                 </ObsidianCard>

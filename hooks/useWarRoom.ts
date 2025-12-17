@@ -58,7 +58,7 @@ const generateInitialKPIs = (): KPIs => {
 const generateInitialSwarms = (): Swarm[] => [
   {
     id: 'SWARM-MARKETING',
-    name: 'Marketing Swarm',
+    name: 'Automatización de Marketing',
     type: 'marketing',
     status: 'active',
     agents: { active: 5, total: 5 },
@@ -76,7 +76,7 @@ const generateInitialSwarms = (): Swarm[] => [
   },
   {
     id: 'SWARM-VENTAS',
-    name: 'Sales Swarm',
+    name: 'Automatización de Ventas',
     type: 'sales',
     status: 'active',
     agents: { active: 3, total: 3 },
@@ -94,7 +94,7 @@ const generateInitialSwarms = (): Swarm[] => [
   },
   {
     id: 'SWARM-OPERACIONES',
-    name: 'Operations Swarm',
+    name: 'Automatización de Operaciones',
     type: 'operations',
     status: 'paused',
     agents: { active: 2, total: 4 },
@@ -111,7 +111,7 @@ const generateInitialSwarms = (): Swarm[] => [
   },
   {
     id: 'SWARM-CONTENIDO',
-    name: 'Content Swarm',
+    name: 'Automatización de Contenido',
     type: 'content',
     status: 'active',
     agents: { active: 4, total: 4 },

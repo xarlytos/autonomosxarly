@@ -46,17 +46,61 @@ export const InteractiveTour: React.FC<InteractiveTourProps> = ({ steps, isOpen,
                 const POPOVER_WIDTH = 320;
                 const POPOVER_HEIGHT = 200; // Approx
                 const MARGIN = 16;
+                const WINDOW_PADDING = 20;
 
                 let popTop = newPos.top + newPos.height + MARGIN;
                 let popLeft = newPos.left;
 
-                // Simple collision detection/adjustment
-                if (popLeft + POPOVER_WIDTH > window.innerWidth) {
-                    popLeft = window.innerWidth - POPOVER_WIDTH - MARGIN;
+                // Horizontal adjustment (keep within screen)
+                if (popLeft + POPOVER_WIDTH > window.innerWidth - WINDOW_PADDING) {
+                    popLeft = window.innerWidth - POPOVER_WIDTH - WINDOW_PADDING;
+                }
+                if (popLeft < WINDOW_PADDING) {
+                    popLeft = WINDOW_PADDING;
                 }
 
-                // If bottom, check if fits, else put top
-                // ... simplistic logic for now
+                // Vertical adjustment (flip to top if no space below)
+                // If the element is tall or at the bottom, placing below might be off-screen
+                const spaceBelow = window.innerHeight - (newPos.top + newPos.height);
+
+                if (spaceBelow < POPOVER_HEIGHT + MARGIN) {
+                    // Try placing above
+                    // Check if there is space above
+                    if (newPos.top > POPOVER_HEIGHT + MARGIN) {
+                        popTop = newPos.top - POPOVER_HEIGHT - MARGIN;
+                    } else {
+                        // If no space above OR below (element is huge, e.g., full screen list)
+                        // Place it floating near the top-left or top-center of the ELEMENT itself
+                        // or just force it to be inside the screen?
+
+                        // Strategy: Pin to bottom of screen if trying to go below, or top of screen if trying to go above.
+                        // Better: If element is huge, place tooltip relative to the top of the element (inside) or just center it?
+                        // Let's trying placing it at the bottom of the visible area of the target?
+
+                        // Simple fallback: If element is huge, stick to the top of the element + margin
+                        popTop = Math.max(WINDOW_PADDING, Math.min(window.innerHeight - POPOVER_HEIGHT - WINDOW_PADDING, popTop));
+
+                        // If that puts it over the element, so be it (z-index handles it), 
+                        // but maybe we want to force "above" logic if element is really tall?
+                        if (newPos.height > window.innerHeight / 2) {
+                            // For large elements, prefer centering or top positioning
+                            // Let's put it near the top of the spotlight area
+                            popTop = newPos.top + MARGIN;
+                            // But wait, that's inside the hole. Text over the content might be hard to read if we don't have a background.
+                            // Our tooltip has a card background, so it's readable.
+                            // But the spotlight is "clear".
+
+                            // Let's stick to "Top" positioning if below doesn't fit
+                            popTop = newPos.top - POPOVER_HEIGHT - MARGIN;
+
+                            // If that is offscreen top?
+                            if (popTop < WINDOW_PADDING) {
+                                // Force it to be on screen, overlapping the element if necessary
+                                popTop = WINDOW_PADDING + 50; // A bit down
+                            }
+                        }
+                    }
+                }
 
                 setPopoverPos({ top: popTop, left: popLeft });
 

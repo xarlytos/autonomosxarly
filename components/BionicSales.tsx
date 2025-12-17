@@ -1216,12 +1216,12 @@ const BionicSales: React.FC = () => {
 
   const getSentimentLabel = (sentiment: Sentiment) => {
     switch (sentiment) {
-      case 'VERY_POSITIVE': return 'Very Positive';
-      case 'POSITIVE': return 'Positive';
-      case 'BUYING_SIGNAL': return '🎯 Buying Signal';
+      case 'VERY_POSITIVE': return 'Muy Positivo';
+      case 'POSITIVE': return 'Positivo';
+      case 'BUYING_SIGNAL': return '🎯 Señal de Compra';
       case 'NEUTRAL': return 'Neutral';
-      case 'NEGATIVE': return 'Negative';
-      case 'OBJECTION': return '⚠️ Objection';
+      case 'NEGATIVE': return 'Negativo';
+      case 'OBJECTION': return '⚠️ Objeción';
       default: return sentiment;
     }
   };
@@ -1243,11 +1243,11 @@ const BionicSales: React.FC = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-6 gap-4">
           <ObsidianCard className="text-center">
-            <p className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-1">Total Pipeline</p>
+            <p className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-1">Pipeline Total</p>
             <p className="text-2xl font-light text-white">${(totalValue / 1000).toFixed(0)}K</p>
           </ObsidianCard>
           <ObsidianCard className="text-center">
-            <p className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-1">Weighted Value</p>
+            <p className="text-xs text-obsidian-text-muted uppercase tracking-wider mb-1">Valor Ponderado</p>
             <p className="text-2xl font-light text-obsidian-accent">${(weightedValue / 1000).toFixed(0)}K</p>
           </ObsidianCard>
           {stages.map(stage => (
@@ -1325,11 +1325,11 @@ const BionicSales: React.FC = () => {
                           className="flex-1 py-1.5 bg-green-500/10 border border-green-500/30 rounded text-xs text-green-500 hover:bg-green-500/20 transition-colors flex items-center justify-center gap-1"
                         >
                           <Phone size={10} />
-                          Call
+                          Llamar
                         </button>
                         <button className="flex-1 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
                           <Mail size={10} />
-                          Email
+                          Correo
                         </button>
                       </div>
                     </ObsidianCard>
@@ -1346,12 +1346,12 @@ const BionicSales: React.FC = () => {
                 <thead className="border-b border-white/10 sticky top-0 bg-[#0F0F12]">
                   <tr className="text-left">
                     <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Lead</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Company</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Stage</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Value</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Probability</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Last Contact</th>
-                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Actions</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Empresa</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Etapa</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Valor</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Probabilidad</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Último Contacto</th>
+                    <th className="px-4 py-3 text-xs text-obsidian-text-muted uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1456,11 +1456,11 @@ const BionicSales: React.FC = () => {
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Deal Value</p>
+                  <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Valor del Trato</p>
                   <p className="text-lg text-white font-mono">${(selectedLead.dealValue / 1000).toFixed(0)}K</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Probability</p>
+                  <p className="text-[10px] text-obsidian-text-muted uppercase mb-1">Probabilidad</p>
                   <p className="text-lg text-obsidian-accent">{selectedLead.probability}%</p>
                 </div>
               </div>
@@ -1483,12 +1483,11 @@ const BionicSales: React.FC = () => {
               </div>
               <div className="space-y-2">
                 {selectedLead.insights.map((insight, idx) => (
-                  <div key={idx} className={`p-2 rounded border ${
-                    insight.type === 'opportunity' ? 'bg-green-500/10 border-green-500/30' :
+                  <div key={idx} className={`p-2 rounded border ${insight.type === 'opportunity' ? 'bg-green-500/10 border-green-500/30' :
                     insight.type === 'risk' ? 'bg-red-500/10 border-red-500/30' :
-                    insight.type === 'competitor' ? 'bg-yellow-500/10 border-yellow-500/30' :
-                    'bg-white/5 border-white/10'
-                  }`}>
+                      insight.type === 'competitor' ? 'bg-yellow-500/10 border-yellow-500/30' :
+                        'bg-white/5 border-white/10'
+                    }`}>
                     <div className="flex items-start gap-2">
                       {insight.type === 'opportunity' && <TrendingUp size={12} className="text-green-500 mt-0.5" />}
                       {insight.type === 'risk' && <AlertTriangle size={12} className="text-red-500 mt-0.5" />}
@@ -1608,7 +1607,7 @@ const BionicSales: React.FC = () => {
             <div className="absolute top-4 right-4 space-y-2 z-20 w-48">
               {/* Sentiment Badge */}
               <div className="bg-[#0F0F12]/90 backdrop-blur border border-white/10 px-3 py-2 rounded">
-                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Sentiment</p>
+                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Sentimiento</p>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getSentimentColor(callData.emotionalMetrics.sentiment) }} />
                   <span className="text-xs font-medium" style={{ color: getSentimentColor(callData.emotionalMetrics.sentiment) }}>
@@ -1619,7 +1618,7 @@ const BionicSales: React.FC = () => {
 
               {/* Trust */}
               <div className="bg-[#0F0F12]/90 backdrop-blur border border-white/10 px-3 py-2 rounded">
-                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Trust</p>
+                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Confianza</p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-green-500 transition-all" style={{ width: `${callData.emotionalMetrics.trust}%` }} />
@@ -1630,7 +1629,7 @@ const BionicSales: React.FC = () => {
 
               {/* Stress */}
               <div className="bg-[#0F0F12]/90 backdrop-blur border border-white/10 px-3 py-2 rounded">
-                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Stress</p>
+                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Estrés</p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-red-500 transition-all" style={{ width: `${callData.emotionalMetrics.stress}%` }} />
@@ -1641,7 +1640,7 @@ const BionicSales: React.FC = () => {
 
               {/* Enthusiasm */}
               <div className="bg-[#0F0F12]/90 backdrop-blur border border-white/10 px-3 py-2 rounded">
-                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Enthusiasm</p>
+                <p className="text-[9px] text-obsidian-text-muted uppercase tracking-wider mb-1">Entusiasmo</p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-obsidian-accent transition-all" style={{ width: `${callData.emotionalMetrics.enthusiasm}%` }} />
@@ -1666,9 +1665,8 @@ const BionicSales: React.FC = () => {
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                  isMuted ? 'bg-red-500 hover:bg-red-600' : 'bg-white/10 hover:bg-white/20 border border-white/20'
-                }`}
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-500 hover:bg-red-600' : 'bg-white/10 hover:bg-white/20 border border-white/20'
+                  }`}
               >
                 {isMuted ? <MicOff size={18} className="text-white" /> : <Mic size={18} className="text-white" />}
               </button>
@@ -1728,9 +1726,8 @@ const BionicSales: React.FC = () => {
             <div className="flex-1 overflow-y-auto space-y-3 pr-2">
               {callData.transcription.map(entry => (
                 <div key={entry.id} className={`flex gap-3 ${entry.speaker === 'agent' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    entry.speaker === 'agent' ? 'bg-obsidian-accent/20' : 'bg-white/5'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${entry.speaker === 'agent' ? 'bg-obsidian-accent/20' : 'bg-white/5'
+                    }`}>
                     {entry.speaker === 'agent' ?
                       <Headphones size={14} className="text-obsidian-accent" /> :
                       <User size={14} className="text-white" />
@@ -1738,9 +1735,8 @@ const BionicSales: React.FC = () => {
                   </div>
                   <div className={`flex-1 ${entry.speaker === 'agent' ? 'text-right' : ''}`}>
                     <div className={`inline-block max-w-[85%] ${entry.speaker === 'agent' ? 'text-right' : ''}`}>
-                      <p className={`text-xs px-3 py-2 rounded-lg ${
-                        entry.speaker === 'agent' ? 'bg-obsidian-accent/10 text-white' : 'bg-white/5 text-white'
-                      }`}>
+                      <p className={`text-xs px-3 py-2 rounded-lg ${entry.speaker === 'agent' ? 'bg-obsidian-accent/10 text-white' : 'bg-white/5 text-white'
+                        }`}>
                         {entry.text}
                       </p>
                       <div className={`flex items-center gap-2 mt-1 ${entry.speaker === 'agent' ? 'justify-end' : ''}`}>
@@ -1781,7 +1777,7 @@ const BionicSales: React.FC = () => {
             <div className="flex items-center gap-2 mb-3">
               <BrainCircuit size={18} className="text-obsidian-accent" />
               <div className="flex-1">
-                <h3 className="text-sm text-white font-medium">Cyrano AI Copilot</h3>
+                <h3 className="text-sm text-white font-medium">Asistente IA de Ventas</h3>
                 <p className="text-[10px] text-obsidian-text-muted">Real-time sales intelligence</p>
               </div>
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -1790,11 +1786,10 @@ const BionicSales: React.FC = () => {
 
           {/* Current Suggestion (Highlighted) */}
           {latestSuggestion && (
-            <ObsidianCard className={`${
-              latestSuggestion.priority === 'critical' ? 'bg-gradient-to-br from-red-500/20 to-transparent border-red-500/40 shadow-lg shadow-red-500/20' :
+            <ObsidianCard className={`${latestSuggestion.priority === 'critical' ? 'bg-gradient-to-br from-red-500/20 to-transparent border-red-500/40 shadow-lg shadow-red-500/20' :
               latestSuggestion.priority === 'high' ? 'bg-gradient-to-br from-yellow-500/20 to-transparent border-yellow-500/40' :
-              'bg-gradient-to-br from-obsidian-accent/10 to-transparent border-obsidian-accent/30'
-            }`}>
+                'bg-gradient-to-br from-obsidian-accent/10 to-transparent border-obsidian-accent/30'
+              }`}>
               <div className="flex items-start gap-2 mb-2">
                 {latestSuggestion.type === 'close' && <Target size={16} className="text-green-500 mt-0.5 animate-pulse" />}
                 {latestSuggestion.type === 'warning' && <AlertTriangle size={16} className="text-red-500 mt-0.5" />}
@@ -1802,22 +1797,20 @@ const BionicSales: React.FC = () => {
                 {latestSuggestion.type === 'tactic' && <Sparkles size={16} className="text-obsidian-accent mt-0.5" />}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                      latestSuggestion.priority === 'critical' ? 'bg-red-500/30 text-red-200' :
+                    <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded ${latestSuggestion.priority === 'critical' ? 'bg-red-500/30 text-red-200' :
                       latestSuggestion.priority === 'high' ? 'bg-yellow-500/30 text-yellow-200' :
-                      'bg-white/10 text-obsidian-text-muted'
-                    }`}>
+                        'bg-white/10 text-obsidian-text-muted'
+                      }`}>
                       {latestSuggestion.priority}
                     </span>
                     <span className="text-[10px] text-obsidian-text-muted">
                       {Math.floor((Date.now() - latestSuggestion.timestamp.getTime()) / 1000)}s ago
                     </span>
                   </div>
-                  <p className={`text-sm font-medium mb-2 ${
-                    latestSuggestion.priority === 'critical' ? 'text-red-200' :
+                  <p className={`text-sm font-medium mb-2 ${latestSuggestion.priority === 'critical' ? 'text-red-200' :
                     latestSuggestion.priority === 'high' ? 'text-yellow-200' :
-                    'text-white'
-                  }`}>
+                      'text-white'
+                    }`}>
                     {latestSuggestion.title}
                   </p>
                   <p className="text-xs text-obsidian-text-secondary leading-relaxed mb-3">
@@ -1862,11 +1855,10 @@ const BionicSales: React.FC = () => {
               {callData.cyranoSuggestions.slice(0, -1).reverse().map(suggestion => (
                 <div
                   key={suggestion.id}
-                  className={`p-2 rounded border text-xs ${
-                    suggestion.priority === 'critical' ? 'bg-red-500/10 border-red-500/30' :
+                  className={`p-2 rounded border text-xs ${suggestion.priority === 'critical' ? 'bg-red-500/10 border-red-500/30' :
                     suggestion.priority === 'high' ? 'bg-yellow-500/10 border-yellow-500/30' :
-                    'bg-white/5 border-white/10'
-                  }`}
+                      'bg-white/5 border-white/10'
+                    }`}
                 >
                   <div className="flex items-start gap-1.5">
                     {suggestion.type === 'close' && <CheckCircle size={12} className="text-green-500 mt-0.5" />}
@@ -1954,7 +1946,7 @@ const BionicSales: React.FC = () => {
                 <span className="text-sm text-green-500 font-medium uppercase tracking-wider">AI Agent Active</span>
               </div>
               <p className="text-xs text-obsidian-text-secondary mb-3">
-                The AI avatar is now conducting the conversation using Cyrano's recommendations.
+                El avatar IA está conduciendo la conversación usando las recomendaciones del asistente.
               </p>
               <button
                 onClick={() => {
@@ -2008,17 +2000,9 @@ const BionicSales: React.FC = () => {
                 {selectedLead.name} • {selectedLead.company} • {formatDuration(callSummary.duration)}
               </p>
             </div>
-            <button
-              onClick={() => {
-                setViewMode('pipeline');
-                setCallSummary(null);
-                setCallData(null);
-                setSelectedLead(null);
-              }}
-              className="flex items-center gap-2 text-obsidian-accent hover:text-white transition-colors"
-            >
-              <ArrowLeft size={16} />
-              <span className="text-sm">Back to Pipeline</span>
+            <button onClick={() => setViewMode('pipeline')} className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
+              <ArrowLeft size={16} className="text-white" />
+              <span className="text-sm">Volver al Pipeline</span>
             </button>
           </div>
 
@@ -2059,13 +2043,12 @@ const BionicSales: React.FC = () => {
                 <div className="space-y-4">
                   {callSummary.keyMoments.map((moment, idx) => (
                     <div key={idx} className="relative pl-8">
-                      <div className={`absolute left-0 top-1 w-6 h-6 rounded-full flex items-center justify-center ${
-                        moment.type === 'buying_signal' ? 'bg-green-500/20' :
+                      <div className={`absolute left-0 top-1 w-6 h-6 rounded-full flex items-center justify-center ${moment.type === 'buying_signal' ? 'bg-green-500/20' :
                         moment.type === 'commitment' ? 'bg-green-500/20' :
-                        moment.type === 'objection' ? 'bg-red-500/20' :
-                        moment.type === 'concern' ? 'bg-yellow-500/20' :
-                        'bg-obsidian-accent/20'
-                      }`}>
+                          moment.type === 'objection' ? 'bg-red-500/20' :
+                            moment.type === 'concern' ? 'bg-yellow-500/20' :
+                              'bg-obsidian-accent/20'
+                        }`}>
                         {moment.type === 'buying_signal' && <Target size={12} className="text-green-500" />}
                         {moment.type === 'commitment' && <CheckCircle size={12} className="text-green-500" />}
                         {moment.type === 'objection' && <AlertTriangle size={12} className="text-red-500" />}
@@ -2074,12 +2057,11 @@ const BionicSales: React.FC = () => {
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <p className={`text-xs font-medium ${
-                            moment.type === 'buying_signal' || moment.type === 'commitment' ? 'text-green-500' :
+                          <p className={`text-xs font-medium ${moment.type === 'buying_signal' || moment.type === 'commitment' ? 'text-green-500' :
                             moment.type === 'objection' ? 'text-red-500' :
-                            moment.type === 'concern' ? 'text-yellow-500' :
-                            'text-obsidian-accent'
-                          }`}>
+                              moment.type === 'concern' ? 'text-yellow-500' :
+                                'text-obsidian-accent'
+                            }`}>
                             {moment.description}
                           </p>
                           <span className="text-[10px] text-obsidian-text-muted">
@@ -2142,11 +2124,10 @@ const BionicSales: React.FC = () => {
                   {callSummary.nextSteps.map((step, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-start gap-3 p-3 rounded border ${
-                        step.priority === 'critical' ? 'bg-red-500/10 border-red-500/30' :
+                      className={`flex items-start gap-3 p-3 rounded border ${step.priority === 'critical' ? 'bg-red-500/10 border-red-500/30' :
                         step.priority === 'high' ? 'bg-yellow-500/10 border-yellow-500/30' :
-                        'bg-white/5 border-white/10'
-                      }`}
+                          'bg-white/5 border-white/10'
+                        }`}
                     >
                       <div className="flex-shrink-0">
                         {step.automated ? (
@@ -2245,25 +2226,23 @@ const BionicSales: React.FC = () => {
       {viewMode === 'pipeline' && (
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-light text-white mb-1">Bionic Sales / Cyrano</h1>
+            <h1 className="text-2xl font-light text-white mb-1">Ventas</h1>
             <p className="text-sm text-obsidian-text-muted">AI-Powered Real-Time Sales Copilot</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex gap-1 bg-[#16161A] border border-white/10 rounded p-1">
               <button
                 onClick={() => setPipelineView('kanban')}
-                className={`px-3 py-1.5 rounded transition-colors text-xs flex items-center gap-1 ${
-                  pipelineView === 'kanban' ? 'bg-obsidian-accent text-white' : 'text-obsidian-text-muted hover:text-white'
-                }`}
+                className={`px-3 py-1.5 rounded transition-colors text-xs flex items-center gap-1 ${pipelineView === 'kanban' ? 'bg-obsidian-accent text-white' : 'text-obsidian-text-muted hover:text-white'
+                  }`}
               >
                 <Grid3X3 size={12} />
                 Kanban
               </button>
               <button
                 onClick={() => setPipelineView('list')}
-                className={`px-3 py-1.5 rounded transition-colors text-xs flex items-center gap-1 ${
-                  pipelineView === 'list' ? 'bg-obsidian-accent text-white' : 'text-obsidian-text-muted hover:text-white'
-                }`}
+                className={`px-3 py-1.5 rounded transition-colors text-xs flex items-center gap-1 ${pipelineView === 'list' ? 'bg-obsidian-accent text-white' : 'text-obsidian-text-muted hover:text-white'
+                  }`}
               >
                 <List size={12} />
                 List

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, FlaskConical, Settings, LogOut, Network, Briefcase, ScanFace, BrainCircuit, Scale, Share2, HeartPulse, Fingerprint, ChevronRight, ChevronLeft, MessageSquareText, Mail, Filter, Gift, Users, Wallet, TrendingUp, Calendar } from 'lucide-react';
+import { useGlobalState } from '../context/GlobalStateContext';
+import { ModeSwitcher } from './ui/ModeSwitcher';
 
 interface SidebarProps {
   currentView: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar';
@@ -9,7 +11,22 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onLogout, onOpenHelp }) => {
+  const { uiMode } = useGlobalState();
   const [isCollapsed, setIsCollapsed] = useState(true);
+
+  // Advanced modules hidden in Basic Mode
+  const advancedModules = [
+    'dto-lab',
+    'swarm-orchestrator',
+    'negotiation-hub',
+    'persona-studio',
+    'content-social',
+    'funnels',
+    'lead-magnet',
+    'ontology-core',
+    'system-health',
+    'ssi-vault'
+  ];
 
   const navSections = [
     {
@@ -50,6 +67,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
     }
   ];
 
+  // Filter sections based on UI Mode
+  const visibleSections = navSections.map(section => ({
+    ...section,
+    items: section.items.filter(item =>
+      uiMode === 'advanced' || !advancedModules.includes(item.id)
+    )
+  })).filter(section => section.items.length > 0);
+
   return (
     <aside
       className={`
@@ -74,7 +99,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
             <div className="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_white]"></div>
           </div>
           {!isCollapsed && (
-            <span className="text-lg font-thin text-white tracking-widest animate-[fadeIn_0.3s_ease-out]">OBSIDIAN</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-thin text-white tracking-widest animate-[fadeIn_0.3s_ease-out]">OBSIDIAN</span>
+              {uiMode === 'lite' && (
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-[8px] rounded-full uppercase tracking-wider self-start mt-1">
+                  Lite
+                </span>
+              )}
+            </div>
           )}
         </div>
         {isCollapsed && <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/10 to-transparent mt-2"></div>}
@@ -86,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
 
-        {navSections.map((section) => (
+        {visibleSections.map((section) => (
           <div key={section.title} className="flex flex-col w-full">
             {/* Section Header */}
             <div className={`
@@ -154,6 +186,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
 
       {/* Footer Actions */}
       <div className={`flex flex-col gap-1 w-full py-4 border-t border-white/[0.04] bg-[#0F0F12]/50 backdrop-blur transition-all ${isCollapsed ? 'items-center' : 'px-3 items-start'}`}>
+
+        {/* Mode Switcher - Only when expanded for now to keep collapsed clean */}
+        {!isCollapsed && (
+          <div className="w-full mb-3 px-1 animate-[fadeIn_0.3s_ease-out]">
+            <ModeSwitcher />
+          </div>
+        )}
 
         {/* Utility Shortcuts */}
         <div className={`flex ${isCollapsed ? 'flex-col gap-2' : 'gap-1 px-2 mb-2 w-full justify-start'}`}>

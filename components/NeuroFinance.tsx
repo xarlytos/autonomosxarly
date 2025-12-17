@@ -189,6 +189,27 @@ const NeuroFinance: React.FC = () => {
     }
   }, [paymentRequest.amount]);
 
+  // Translation helpers
+  const translateInvoiceStatus = (status: string) => {
+    const translations: Record<string, string> = {
+      'PAID': 'PAGADO',
+      'SENT': 'ENVIADO',
+      'VIEWED': 'VISTO',
+      'OVERDUE': 'VENCIDO',
+      'DRAFT': 'BORRADOR'
+    };
+    return translations[status] || status;
+  };
+
+  const translateTxStatus = (status: string) => {
+    const translations: Record<string, string> = {
+      'VERIFIED': 'VERIFICADO',
+      'PROCESSING': 'PROCESANDO',
+      'FLAGGED': 'MARCADO'
+    };
+    return translations[status] || status;
+  };
+
   // ==================== LOADING SCREEN ====================
   if (isLoading) {
     return (
@@ -719,7 +740,7 @@ const NeuroFinance: React.FC = () => {
                           invoice.status === 'SENT' ? 'bg-blue-500/20 text-blue-500' :
                             'bg-gray-500/20 text-gray-500'
                       }`}>
-                      {invoice.status}
+                      {translateInvoiceStatus(invoice.status)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -1362,7 +1383,7 @@ const NeuroFinance: React.FC = () => {
                           type="text"
                           className="w-full bg-transparent text-sm text-white focus:outline-none placeholder-obsidian-text-muted/30"
                           placeholder="Descripción del servicio..."
-                          defaultValue="Implementación de Swarm"
+                          defaultValue="Implementación de Automatizaciones"
                         />
                       </div>
                       <div className="col-span-2">
