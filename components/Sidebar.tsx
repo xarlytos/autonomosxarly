@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, FlaskConical, Settings, LogOut, Network, Briefcase, ScanFace, BrainCircuit, Scale, Share2, HeartPulse, Fingerprint, ChevronRight, ChevronLeft, MessageSquareText, Mail, Filter, Gift, Users, Wallet, TrendingUp, Calendar } from 'lucide-react';
+import { LayoutDashboard, FlaskConical, Settings, LogOut, Network, Briefcase, ScanFace, BrainCircuit, Scale, Share2, HeartPulse, Fingerprint, ChevronRight, ChevronLeft, MessageSquareText, Mail, Filter, Gift, Users, Wallet, TrendingUp, Calendar, Bot } from 'lucide-react';
 import { useGlobalState } from '../context/GlobalStateContext';
 import { ModeSwitcher } from './ui/ModeSwitcher';
 
 interface SidebarProps {
-  currentView: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar';
-  onChangeView: (view: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar') => void;
+  currentView: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'ai-agents' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar';
+  onChangeView: (view: 'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'ai-agents' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar') => void;
   onLogout: () => void;
   onOpenHelp: () => void;
 }
@@ -48,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onL
     {
       title: 'GROWTH',
       items: [
-        { id: 'persona-studio', label: 'Personas', icon: <ScanFace size={20} /> },
+        { id: 'ai-agents', label: 'Agentes IA', icon: <Bot size={20} /> },
         { id: 'content-social', label: 'Redes Sociales', icon: <MessageSquareText size={20} /> },
         { id: 'bionic-sales', label: 'Ventas', icon: <TrendingUp size={20} /> },
         { id: 'contacts', label: 'Contactos', icon: <Users size={20} /> },

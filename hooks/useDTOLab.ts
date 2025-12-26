@@ -1,236 +1,168 @@
 import { useState, useEffect, useCallback } from 'react';
 
-// Parámetros de simulación
-export interface SimulationParams {
-  priceAdjustment: number; // -50 a +50 (%)
-  marketingInvestment: number; // 0 a 100 (k)
-  marketVolatility: number; // 10 a 90 (%)
-  timeHorizon: number; // 30 a 365 (días)
-  competitorReaction: boolean;
-  economicRecession: boolean;
-  viralTrend: boolean;
-  regulatoryChange: boolean;
+// Enhanced interface for time-series data points
+export interface DataPoint {
+  date: string;
+  revenue: number;
+  clients: number;
+  expenses: number;
+  profit: number;
+  isProjection: boolean;
+  growthRate?: number;
+  conversionRate?: number;
+  avgRevenue7d?: number;
+  avgRevenue30d?: number;
 }
 
-// Resultados de simulación
+// Enhanced results structure
 export interface SimulationResults {
-  successProbability: number; // 0-100
-  projectedROI: number; // porcentaje
-  baselineROI: number; // porcentaje
-  riskLevel: 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
-  riskScore: number; // 0-100
-  lossRisk: number; // probabilidad de pérdida 0-100
-
-  // Distribución de resultados (para histograma)
-  distribution: { value: number; frequency: number }[];
-
-  // Análisis de sensibilidad (impacto de cada parámetro)
-  sensitivity: {
-    parameter: string;
-    impact: number; // -100 a 100
-  }[];
-
-  // Trayectorias del cono de incertidumbre
-  trajectories: {
-    days: number[];
-    paths: number[][]; // múltiples trayectorias
-    median: number[];
-    percentile25: number[];
-    percentile75: number[];
+  data: DataPoint[];
+  summary: {
+    totalRevenue: number;
+    totalProfit: number;
+    newClients: number;
+    profitMargin: number;
+    avgGrowthRate: number;
+    projectedROI: number;
   };
-
-  // Métricas adicionales
-  expectedValue: number;
-  worstCase: number;
-  bestCase: number;
-  variance: number;
 }
 
-// Escenario guardado
 export interface Scenario {
   id: string;
   name: string;
-  params: SimulationParams;
   results: SimulationResults;
   createdAt: string;
 }
 
-// Función auxiliar: Generar número aleatorio con distribución normal
-function randomNormal(mean: number = 0, stdev: number = 1): number {
-  const u1 = Math.random();
-  const u2 = Math.random();
-  const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-  return z0 * stdev + mean;
-}
+export type Granularity = 'daily' | 'weekly' | 'monthly';
 
-// Función para generar simulación de Monte Carlo
-function runMonteCarloSimulation(params: SimulationParams): SimulationResults {
-  const iterations = 10000;
-  const days = params.timeHorizon;
-
-  // Calcular factores base
-  const priceImpact = params.priceAdjustment * 0.4; // Precio afecta ROI
-  const marketingImpact = params.marketingInvestment * 0.15; // Marketing aumenta ROI
-  const volatility = params.marketVolatility / 100;
-
-  // Factores externos
-  const competitorPenalty = params.competitorReaction ? -5 : 0;
-  const recessionPenalty = params.economicRecession ? -8 : 0;
-  const viralBonus = params.viralTrend ? 15 : 0;
-  const regulatoryPenalty = params.regulatoryChange ? -3 : 0;
-
-  const baseROI = 12; // ROI base
-  const meanROI = baseROI + priceImpact + marketingImpact + competitorPenalty + recessionPenalty + viralBonus + regulatoryPenalty;
-
-  // Ejecutar simulaciones
-  const results: number[] = [];
-  const trajectories: number[][] = [];
-
-  for (let i = 0; i < iterations; i++) {
-    let currentROI = baseROI;
-    const trajectory: number[] = [currentROI];
-
-    // Simular evolución día a día
-    for (let day = 1; day <= days; day++) {
-      const dailyChange = randomNormal(meanROI / days, volatility * 0.5);
-      currentROI += dailyChange;
-      if (day % Math.floor(days / 90) === 0) { // Guardar cada cierto número de días
-        trajectory.push(currentROI);
-      }
-    }
-
-    results.push(currentROI);
-    if (i < 200) { // Guardar solo 200 trayectorias para visualización
-      trajectories.push(trajectory);
-    }
-  }
-
-  // Calcular estadísticas
-  results.sort((a, b) => a - b);
-
-  const successProbability = (results.filter(r => r > baseROI).length / iterations) * 100;
-  const projectedROI = results.reduce((sum, r) => sum + r, 0) / iterations;
-  const worstCase = results[Math.floor(iterations * 0.05)]; // Percentil 5
-  const bestCase = results[Math.floor(iterations * 0.95)]; // Percentil 95
-  const median = results[Math.floor(iterations * 0.5)];
-  const p25 = results[Math.floor(iterations * 0.25)];
-  const p75 = results[Math.floor(iterations * 0.75)];
-
-  // Calcular varianza
-  const variance = results.reduce((sum, r) => sum + Math.pow(r - projectedROI, 2), 0) / iterations;
-
-  // Distribución para histograma
-  const binCount = 30;
-  const minVal = worstCase;
-  const maxVal = bestCase;
-  const binSize = (maxVal - minVal) / binCount;
-  const distribution: { value: number; frequency: number }[] = [];
-
-  for (let i = 0; i < binCount; i++) {
-    const binStart = minVal + i * binSize;
-    const binEnd = binStart + binSize;
-    const frequency = results.filter(r => r >= binStart && r < binEnd).length / iterations;
-    distribution.push({
-      value: (binStart + binEnd) / 2,
-      frequency: frequency * 100
-    });
-  }
-
-  // Análisis de sensibilidad (impacto de cada parámetro)
-  const sensitivity = [
-    { parameter: 'Precio', impact: Math.abs(priceImpact) * (priceImpact >= 0 ? 1 : -1) },
-    { parameter: 'Marketing', impact: marketingImpact * 0.8 },
-    { parameter: 'Volatilidad', impact: -volatility * 15 },
-    { parameter: 'Competencia', impact: competitorPenalty * 1.2 },
-    { parameter: 'Recesión', impact: recessionPenalty * 1.5 },
-    { parameter: 'Viral', impact: viralBonus * 0.9 },
-    { parameter: 'Regulación', impact: regulatoryPenalty }
-  ].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
-
-  // Calcular nivel de riesgo
-  const lossRisk = (results.filter(r => r < 0).length / iterations) * 100;
-  let riskLevel: SimulationResults['riskLevel'];
-  let riskScore: number;
-
-  if (lossRisk < 5) {
-    riskLevel = 'very_low';
-    riskScore = 10;
-  } else if (lossRisk < 15) {
-    riskLevel = 'low';
-    riskScore = 25;
-  } else if (lossRisk < 30) {
-    riskLevel = 'medium';
-    riskScore = 50;
-  } else if (lossRisk < 50) {
-    riskLevel = 'high';
-    riskScore = 75;
-  } else {
-    riskLevel = 'very_high';
-    riskScore = 90;
-  }
-
-  // Preparar trayectorias para visualización
-  const trajectoryLength = trajectories.length > 0 ? trajectories[0].length : 0;
-  const daysArray = Array.from({ length: trajectoryLength }, (_, i) => Math.floor((i / trajectoryLength) * days));
-
-  // Calcular mediana para cada punto temporal
-  const medianPath: number[] = [];
-  const p25Path: number[] = [];
-  const p75Path: number[] = [];
-
-  if (trajectoryLength > 0) {
-    for (let i = 0; i < trajectoryLength; i++) {
-      const valuesAtPoint = trajectories.map(traj => traj[i]).sort((a, b) => a - b);
-      medianPath.push(valuesAtPoint[Math.floor(valuesAtPoint.length * 0.5)]);
-      p25Path.push(valuesAtPoint[Math.floor(valuesAtPoint.length * 0.25)]);
-      p75Path.push(valuesAtPoint[Math.floor(valuesAtPoint.length * 0.75)]);
-    }
-  }
-
-  return {
-    successProbability,
-    projectedROI,
-    baselineROI: baseROI,
-    riskLevel,
-    riskScore,
-    lossRisk,
-    distribution,
-    sensitivity,
-    trajectories: {
-      days: daysArray,
-      paths: trajectories,
-      median: medianPath,
-      percentile25: p25Path,
-      percentile75: p75Path
-    },
-    expectedValue: projectedROI,
-    worstCase,
-    bestCase,
-    variance
+export interface FilterOptions {
+  dateFrom: string;
+  dateTo: string;
+  granularity: Granularity;
+  visibleMetrics: {
+    revenue: boolean;
+    expenses: boolean;
+    profit: boolean;
+    clients: boolean;
   };
 }
 
-// Hook principal
-export function useDTOLab() {
-  const [params, setParams] = useState<SimulationParams>({
-    priceAdjustment: 20,
-    marketingInvestment: 50,
-    marketVolatility: 30,
-    timeHorizon: 90,
-    competitorReaction: false,
-    economicRecession: false,
-    viralTrend: false,
-    regulatoryChange: false
-  });
+// Helper to generate realistic-looking random walk data
+const generateTimeSeries = (daysBack: number, daysForward: number): DataPoint[] => {
+  const data: DataPoint[] = [];
+  const today = new Date();
 
+  // Initial baselines
+  let currentRevenue = 50000;
+  let currentClients = 120;
+  let currentExpenses = 30000;
+
+  for (let i = -daysBack; i <= daysForward; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+
+    // Add some randomness and trends
+    const growthFactor = i > 0 ? 1.002 : 1.001;
+    const volatility = 0.05;
+
+    currentRevenue = currentRevenue * growthFactor * (1 + (Math.random() - 0.5) * volatility);
+    currentClients = currentClients * growthFactor * (1 + (Math.random() - 0.5) * (volatility * 0.5));
+    currentExpenses = currentExpenses * (growthFactor * 0.999) * (1 + (Math.random() - 0.5) * (volatility * 0.2));
+
+    const profit = currentRevenue - currentExpenses;
+    const conversionRate = 2 + Math.random() * 3; // 2-5%
+
+    data.push({
+      date: date.toISOString().split('T')[0],
+      revenue: Math.round(currentRevenue),
+      clients: Math.round(currentClients),
+      expenses: Math.round(currentExpenses),
+      profit: Math.round(profit),
+      isProjection: i > 0,
+      conversionRate: parseFloat(conversionRate.toFixed(2))
+    });
+  }
+
+  // Calculate growth rates and moving averages
+  for (let i = 0; i < data.length; i++) {
+    if (i > 0) {
+      const prevRevenue = data[i - 1].revenue;
+      const currentRevenue = data[i].revenue;
+      data[i].growthRate = parseFloat((((currentRevenue - prevRevenue) / prevRevenue) * 100).toFixed(2));
+    }
+
+    // 7-day moving average
+    if (i >= 6) {
+      const sum = data.slice(i - 6, i + 1).reduce((acc, d) => acc + d.revenue, 0);
+      data[i].avgRevenue7d = Math.round(sum / 7);
+    }
+
+    // 30-day moving average
+    if (i >= 29) {
+      const sum = data.slice(i - 29, i + 1).reduce((acc, d) => acc + d.revenue, 0);
+      data[i].avgRevenue30d = Math.round(sum / 30);
+    }
+  }
+
+  return data;
+};
+
+// Aggregate data by granularity
+const aggregateData = (data: DataPoint[], granularity: Granularity): DataPoint[] => {
+  if (granularity === 'daily') return data;
+
+  const aggregated: DataPoint[] = [];
+  const groupSize = granularity === 'weekly' ? 7 : 30;
+
+  for (let i = 0; i < data.length; i += groupSize) {
+    const group = data.slice(i, i + groupSize);
+    if (group.length === 0) continue;
+
+    const avgRevenue = group.reduce((sum, d) => sum + d.revenue, 0) / group.length;
+    const avgExpenses = group.reduce((sum, d) => sum + d.expenses, 0) / group.length;
+    const avgClients = group.reduce((sum, d) => sum + d.clients, 0) / group.length;
+    const avgProfit = avgRevenue - avgExpenses;
+
+    aggregated.push({
+      date: group[0].date,
+      revenue: Math.round(avgRevenue),
+      expenses: Math.round(avgExpenses),
+      clients: Math.round(avgClients),
+      profit: Math.round(avgProfit),
+      isProjection: group[0].isProjection,
+      growthRate: group[group.length - 1].growthRate,
+      conversionRate: group.reduce((sum, d) => sum + (d.conversionRate || 0), 0) / group.length,
+      avgRevenue7d: group[group.length - 1].avgRevenue7d,
+      avgRevenue30d: group[group.length - 1].avgRevenue30d
+    });
+  }
+
+  return aggregated;
+};
+
+export function useDTOLab() {
+  const [rawData, setRawData] = useState<DataPoint[]>([]);
   const [results, setResults] = useState<SimulationResults | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isComputing, setIsComputing] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
 
-  // Load scenarios from LocalStorage on mount
+  const [filters, setFilters] = useState<FilterOptions>({
+    dateFrom: '',
+    dateTo: '',
+    granularity: 'daily',
+    visibleMetrics: {
+      revenue: true,
+      expenses: true,
+      profit: true,
+      clients: true
+    }
+  });
+
+  // Load scenarios from LocalStorage
   useEffect(() => {
-    const savedScenarios = localStorage.getItem('obsidian_dto_scenarios');
+    const savedScenarios = localStorage.getItem('obsidian_dto_scenarios_v2');
     if (savedScenarios) {
       try {
         setScenarios(JSON.parse(savedScenarios));
@@ -240,56 +172,119 @@ export function useDTOLab() {
     }
   }, []);
 
-  // Save to LocalStorage whenever scenarios change
+  // Save scenarios to LocalStorage
   useEffect(() => {
-    localStorage.setItem('obsidian_dto_scenarios', JSON.stringify(scenarios));
+    localStorage.setItem('obsidian_dto_scenarios_v2', JSON.stringify(scenarios));
   }, [scenarios]);
 
-  // Ejecutar simulación cuando cambian los parámetros
+  // Initial simulation run
   useEffect(() => {
-    setIsComputing(true);
-
-    const timer = setTimeout(() => {
-      const newResults = runMonteCarloSimulation(params);
-      setResults(newResults);
-      setIsComputing(false);
-    }, 800); // Simular tiempo de cómputo
-
-    return () => clearTimeout(timer);
-  }, [params]);
-
-  // Actualizar parámetro específico
-  const updateParam = useCallback((key: keyof SimulationParams, value: any) => {
-    setParams(prev => ({ ...prev, [key]: value }));
-    setSelectedScenario(null); // Deseleccionar escenario al modificar
+    runSimulation();
   }, []);
 
-  // Guardar escenario actual
+  // Apply filters when they change
+  useEffect(() => {
+    if (rawData.length === 0) return;
+    applyFilters();
+  }, [filters, rawData]);
+
+  const runSimulation = useCallback(() => {
+    setIsComputing(true);
+    setTimeout(() => {
+      const data = generateTimeSeries(90, 180);
+      setRawData(data);
+
+      // Set initial date range
+      setFilters(prev => ({
+        ...prev,
+        dateFrom: data[0].date,
+        dateTo: data[data.length - 1].date
+      }));
+
+      setIsComputing(false);
+    }, 600);
+  }, []);
+
+  const applyFilters = useCallback(() => {
+    let filteredData = [...rawData];
+
+    // Filter by date range
+    if (filters.dateFrom) {
+      filteredData = filteredData.filter(d => d.date >= filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      filteredData = filteredData.filter(d => d.date <= filters.dateTo);
+    }
+
+    // Aggregate by granularity
+    filteredData = aggregateData(filteredData, filters.granularity);
+
+    // Calculate summary
+    const projections = filteredData.filter(d => d.isProjection);
+    const totalRevenue = projections.reduce((acc, curr) => acc + curr.revenue, 0);
+    const totalProfit = projections.reduce((acc, curr) => acc + curr.profit, 0);
+    const totalExpenses = projections.reduce((acc, curr) => acc + curr.expenses, 0);
+
+    const newClients = projections.length > 0
+      ? projections[projections.length - 1].clients - projections[0].clients
+      : 0;
+    const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+
+    const growthRates = projections.map(d => d.growthRate || 0).filter(r => r !== 0);
+    const avgGrowthRate = growthRates.length > 0
+      ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length
+      : 0;
+
+    const projectedROI = totalRevenue > 0 ? ((totalProfit / totalExpenses) * 100) : 0;
+
+    setResults({
+      data: filteredData,
+      summary: {
+        totalRevenue,
+        totalProfit,
+        newClients: Math.max(0, newClients),
+        profitMargin,
+        avgGrowthRate,
+        projectedROI
+      }
+    });
+  }, [rawData, filters]);
+
+  const updateFilter = useCallback((key: keyof FilterOptions, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const toggleMetric = useCallback((metric: keyof FilterOptions['visibleMetrics']) => {
+    setFilters(prev => ({
+      ...prev,
+      visibleMetrics: {
+        ...prev.visibleMetrics,
+        [metric]: !prev.visibleMetrics[metric]
+      }
+    }));
+  }, []);
+
   const saveScenario = useCallback((name: string) => {
     if (!results) return;
-
     const scenario: Scenario = {
       id: `SCN-${Date.now()}`,
       name,
-      params: { ...params },
       results: { ...results },
       createdAt: new Date().toISOString()
     };
-
     setScenarios(prev => [scenario, ...prev]);
     setSelectedScenario(scenario.id);
-  }, [params, results]);
+  }, [results]);
 
-  // Cargar escenario
   const loadScenario = useCallback((scenarioId: string) => {
     const scenario = scenarios.find(s => s.id === scenarioId);
     if (scenario) {
-      setParams(scenario.params);
+      setResults(scenario.results);
+      setRawData(scenario.results.data);
       setSelectedScenario(scenarioId);
     }
   }, [scenarios]);
 
-  // Eliminar escenario
   const deleteScenario = useCallback((scenarioId: string) => {
     setScenarios(prev => prev.filter(s => s.id !== scenarioId));
     if (selectedScenario === scenarioId) {
@@ -297,55 +292,17 @@ export function useDTOLab() {
     }
   }, [selectedScenario]);
 
-  // Cargar preset
-  const loadPreset = useCallback((preset: 'conservative' | 'moderate' | 'aggressive') => {
-    const presets: Record<typeof preset, SimulationParams> = {
-      conservative: {
-        priceAdjustment: -10,
-        marketingInvestment: 30,
-        marketVolatility: 15,
-        timeHorizon: 90,
-        competitorReaction: true,
-        economicRecession: false,
-        viralTrend: false,
-        regulatoryChange: false
-      },
-      moderate: {
-        priceAdjustment: 0,
-        marketingInvestment: 50,
-        marketVolatility: 30,
-        timeHorizon: 90,
-        competitorReaction: false,
-        economicRecession: false,
-        viralTrend: false,
-        regulatoryChange: false
-      },
-      aggressive: {
-        priceAdjustment: 25,
-        marketingInvestment: 80,
-        marketVolatility: 45,
-        timeHorizon: 90,
-        competitorReaction: true,
-        economicRecession: false,
-        viralTrend: true,
-        regulatoryChange: false
-      }
-    };
-
-    setParams(presets[preset]);
-    setSelectedScenario(null);
-  }, []);
-
   return {
-    params,
     results,
     scenarios,
     isComputing,
     selectedScenario,
-    updateParam,
+    filters,
+    runSimulation,
     saveScenario,
     loadScenario,
     deleteScenario,
-    loadPreset
+    updateFilter,
+    toggleMetric
   };
 }

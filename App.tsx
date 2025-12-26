@@ -14,6 +14,7 @@ import ContentSocialStudio from './components/ContentSocialStudio';
 import EmailHub from './components/EmailHub';
 import Funnels from './components/Funnels';
 import LeadMagnet from './components/LeadMagnet';
+import AIAgentsPage from './components/AIAgentsPage';
 import { ContactManager } from './components/CRM/ContactManager';
 import { ObsidianCard, ObsidianButton } from './components/ui/ObsidianElements';
 import type { AuthState, LoginFormData } from './types';
@@ -268,7 +269,7 @@ const App: React.FC = () => {
     error: null,
   });
 
-  const [currentView, setCurrentView] = useState<'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar'>('war-room');
+  const [currentView, setCurrentView] = useState<'war-room' | 'dto-lab' | 'swarm-orchestrator' | 'negotiation-hub' | 'persona-studio' | 'ai-agents' | 'content-social' | 'bionic-sales' | 'neuro-finance' | 'ontology-core' | 'system-health' | 'ssi-vault' | 'email-hub' | 'funnels' | 'lead-magnet' | 'contacts' | 'calendar'>('war-room');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Advanced modules that are restricted in Lite Mode
@@ -344,6 +345,7 @@ const App: React.FC = () => {
           {currentView === 'swarm-orchestrator' && <SwarmOrchestrator />}
           {currentView === 'negotiation-hub' && <NegotiationHub />}
           {currentView === 'persona-studio' && <PersonaStudio />}
+          {currentView === 'ai-agents' && <AIAgentsPage />}
           {currentView === 'content-social' && <ContentSocialStudio />}
           {currentView === 'bionic-sales' && <BionicSales />}
           {currentView === 'contacts' && <ContactManager />}
